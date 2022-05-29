@@ -47,7 +47,7 @@ yat:
 # header_transparent: true
 
 # Google analytics
-  google_analytics: "G-PKFPGTDZ2Y"
+  google_analytics: G-PKFPGTDZ2Y
 
 # If you want to generate website sitemap, you can set true
   sitemap: true
@@ -193,5 +193,5 @@ analytics:
   provider               : "google-gtag"
   # false (default), "google", "google-universal", "google-gtag", "custom"
   google:
-    tracking_id          : "G-PKFPGTDZ2Y"
-    anonymize_ip         : true
+    tracking_id          : G-PKFPGTDZ2Y
+    anonymize_ip         : false
