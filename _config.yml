@@ -47,10 +47,10 @@ yat:
 # header_transparent: true
 
 # Google analytics
-  google_analytics: G-PKFPGTDZ2Y
+  google_analytics: [G-PKFPGTDZ2Y]
 
 # If you want to generate website sitemap, you can set true
-# sitemap: false
+  sitemap: true
 
 # If you want to change site language, you can set lang option
 # lang: "en"  # default lang is en
