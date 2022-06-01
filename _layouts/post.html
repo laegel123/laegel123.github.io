@@ -59,13 +59,9 @@ sidebar:
     {%- assign result = hidden | where_exp: "item", "item == 'comments'" -%}
     {%- if result.size == 0 -%}
     <div class="post-comments">
-      <script src="https://utteranc.es/client.js"
-              repo="laegel123/laegel123.github.io"
-              issue-term="pathname"
-              theme="github-light"
-              crossorigin="anonymous"
-              async>
-      </script>
+      <!-- utterance 댓글 기능 추가 -->
+      {%- include extensions/comments/utterance.html -%}
+
       {%- if page.comments != false -%}
 
       {%- if site.disqus.shortname -%}
