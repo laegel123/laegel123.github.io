@@ -8,8 +8,8 @@ tags: [JPA, Spring]
 
 ## Spring JPA 란?
 
-JPA 관련 서적을 읽을 때는 분명 EntityManager를 통해 entity CRUD 를 했는데, 실제 현업에 들어가 보니 EntityManager는 찾아볼 수 없고  
-Repository 인터페이스만 쓰이고 있어 개념이 모호해 정리글을 쓴다.
+JPA 관련 서적을 읽을 때는 분명 EntityManager를 통해 entity CRUD 를 했는데, 
+실제 현업에 들어가 보니 EntityManager는 찾아볼 수 없고 Repository 인터페이스만 쓰이고 있어 개념이 모호해 정리글을 쓴다.
 
 JPA, Hibernate, 그리고 Spring Data JPA(Repository)의 차이점에 대해 알아보자.
 
@@ -78,8 +78,9 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 ~~~
 
 아래 그림은 위의 내용을 요약하여 JPA, Hibernate, 그리고 Spring Data JPA의 전반적인 개념을 그림으로 표현한 이미지다.
-![dfs](/assets/images/etc/jpa_introduce.png){: width="50%" height="50%"}
+![jpa_introduce](/assets/images/etc/jpa_introduce.png)
 
+---
 ## JPA 장단점
 
 이제 JPA가 어떤 의미인지 알았다면, 장단점도 비교하며 알아보자.
@@ -96,4 +97,5 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 2. 복잡하고 무거운 Query는 속도를 위해 별도의 튜닝이 필요한 경우도 있어 결국 SQL을 써야할 때도 있다.
 3. 학습비용이 비싸다.
 
-이렇듯 장점도 많은 JPA를 잘 사용하기 위해서는 JPA에 대해 확실한 학습이 되어있고 프로젝트에 들어갔을 때 초기 설계(db 테이블과 객체간의 매핑 등)를 신경써야 한다는 것을 알 수 있다.
+
+> 이렇듯 장점도 많은 JPA를 잘 사용하기 위해서는 JPA에 대해 확실한 학습이 되어있고 프로젝트에 들어갔을 때 초기 설계(db 테이블과 객체간의 매핑 등)를 신경써야 한다는 것을 알 수 있다.
