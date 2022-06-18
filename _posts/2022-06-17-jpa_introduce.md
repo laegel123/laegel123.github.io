@@ -99,3 +99,37 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 
 
 > 이렇듯 장점도 많은 JPA를 잘 사용하기 위해서는 JPA에 대해 확실한 학습이 되어있고 프로젝트에 들어갔을 때 초기 설계(db 테이블과 객체간의 매핑 등)를 신경써야 한다는 것을 알 수 있다.
+
+
+---
+
+## JPA 클래스 수준 아키텍처
+
+아래의 이미지는 JPA의 클래스 레벨 아키텍처이다. 이제 여러가지 코어적인 JPA의 클래스와 인터페이스들을 살펴보자.
+![jpaClassArchitecture](/assets/images/etc/jpaClassArchitecture.png)
+
+1. EntityManagerFactory
+   - EntityManager 클래스의 팩토리 클래스이다. 이 클래스로 EntityManager 클래스의 인스턴스를 생성하고 관리할 수 있다.
+   - 같은 EntityManagerFactory를 통해 생성되는 EntityManager 들은 같은 데이터베이스에 접속한다.
+   - 한 번 생성한 후 어플리케이션 전체에 공유되며, thread safe 한 성질을 가진다.
+2. EntityManager
+   - 여러 Entity들을 관리하는 역할을 한다.
+   - EntityManager는 자신이 관리해야하는 Entity 객체들을 영속 컨텍스트(Persistence Context)에 넣어 객체들의 LifeCycle을 관리한다.
+   - 또한 thread safe 하지 않기 때문에 여러 스레드가 동시에 접근하면 동시성 문제가 발생한다.
+3. Entity
+   : 데이터베이스 상에서 데이터로 관리하는 대상을 의미한다.  
+     JPA에서 하나의 Entity 타입을 생성한다는 것은 하나의 클래스를 작성하는 것을 의미한다.
+4. EntityTransaction
+   : EntityManager와 일대일 관계이다. 각각의 EntityManager들의 작업은 EntityTransaction 클래스에 의해 유지된다.
+5. Persistence
+   : EntityManagerFactory 를 가져오는 데 사용되는 부트스트랩 클래스이다.
+6. Query
+   : 인터페이스로서 각각의 JPA 벤더에 의해 구현되며 각 기준에 충족하는 관계형 객체를 얻는다.
+
+> 영속 컨텍스트 (Persistence Context) 란?  
+> JPA가 Entity 객체들을 모아두는 공간이다.  
+> Entity를 영구 저장할 수 있는 환경이며 논리적인 개념이다.  
+> EntityManager는 Entity를 저장하거나 조회할 때 Persistence Context에 Entity를 보관하고 관리한다.
+
+
+
