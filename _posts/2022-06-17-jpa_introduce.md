@@ -126,6 +126,21 @@ JPA 구현체를 추가로 필요로 해 Hibernate를 사용한 것이다.
 
 ---
 
+## JPA 클래스 간의 관계
+
+위의 아키텍처에서 클래스와 인터페이스들은 javax.persistence 패키지에 속해있다는 것을 알 수 있을 것이다. 그렇다면 이제 이들간의 관계에 대해서 알아보자.
+
+![jpaClassrelation](/assets/images/etc/jpaClassrelation.png)
+
+먼저, EntityManagerFactory와 EntityManager와의 관계는 일 대 다 관계라는 것을 알 수 있다. EntityManagerFactory 클래스는 EntityManager 클래스의 인스턴스를 생성하는 팩토리 클래스이다.
+
+EntityManager와 EntityTransaction 의 관계는 일 대 일 관계이다. 각각의 EntityManager 의 작업에서 EntityTransaction 인스턴스가 작동한다.
+
+EntityManager와 Query의 관계는 일 대 다 관계이다. 한 EntityManager 를 통해 여러 가지 Query 객체로 sql이 실행될 수 있다.
+
+EntityManger와 Entity의 관계는 일 대 다 관계이다. 한 EntityManager 인스턴스는 여러 Entity 들을 관리할 수 있다.
+
+
 ## JPA 장단점
 
 이제 JPA가 어떤 의미인지 알았다면, 장단점도 비교하며 알아보자.
@@ -145,8 +160,6 @@ JPA 구현체를 추가로 필요로 해 Hibernate를 사용한 것이다.
 
 > 이렇듯 장점도 많은 JPA를 잘 사용하기 위해서는 JPA에 대해 확실한 학습이 되어있고 프로젝트에 들어갔을 때 초기 설계(db 테이블과 객체간의 매핑 등)를 신경써야 한다는 것을 알 수 있다.
 
-
----
 
 
 
