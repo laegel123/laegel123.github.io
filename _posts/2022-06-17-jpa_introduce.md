@@ -90,7 +90,9 @@ JPA 구현체를 추가로 필요로 해 Hibernate를 사용한 것이다.
 
 ---
 
-## JPA 클래스 수준 아키텍처 (javax.persistence)
+## Java Persistence Api (javax.persistence)
+
+### JPA 클래스 레벨에서 아키텍처 설명
 
 아래의 이미지는 JPA의 클래스 레벨 아키텍처이다.  
 여기서 중요한 클래스 밑 인터페이스, 개념만 집어서 살펴보자.
@@ -124,9 +126,8 @@ JPA 구현체를 추가로 필요로 해 Hibernate를 사용한 것이다.
 > Entity를 영구 저장할 수 있는 환경이며 논리적인 개념이다.  
 > EntityManager는 Entity를 저장하거나 조회할 때 Persistence Context에 Entity를 보관하고 관리한다.
 
----
 
-## JPA 클래스 간의 관계
+### JPA 클래스 간의 관계
 
 위의 아키텍처에서 클래스와 인터페이스들은 javax.persistence 패키지에 속해있다는 것을 알 수 있을 것이다. 그렇다면 이제 이들간의 관계에 대해서 알아보자.
 
@@ -140,6 +141,7 @@ EntityManager와 Query의 관계는 일 대 다 관계이다. 한 EntityManager 
 
 EntityManger와 Entity의 관계는 일 대 다 관계이다. 한 EntityManager 인스턴스는 여러 Entity 들을 관리할 수 있다.
 
+---
 
 ## JPA 장단점
 
