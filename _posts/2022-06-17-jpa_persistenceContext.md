@@ -10,7 +10,7 @@ tags: [JPA, Spring, Persistence Context]
 
 JPA가 제공하는 기능은 크게 엔티티와 데이터베이스 테이블을 매핑하는 설계 부분과 매핑한 엔티티를 실제 사용하는 부분으로 나눌 수 있다. 매핑한 엔티티는 EntityManager를 통해 사용되는데 
 이 Entitymanager class 에 대해 공식 문서를 살펴보면 첫 문장에 다음과 같은 설명으로 시작된다.
-> _**Interface used to interact with the persistence context.**_
+> _**Interface used to interact with the persistence context.**_  
 >  "영속성 컨텍스트와 상호작용 하는 데 사용되는 인터페이스"
 
 즉, EntityManager 에 대해 알기 위해서는 영속성 컨텍스트에 대한 깊은 이해가 필요하다는 것을 알 수 있다.
