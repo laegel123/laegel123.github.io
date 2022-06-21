@@ -2,7 +2,7 @@
 layout: post
 title: Spring Data JPA 란?
 subtitle: Spring Data JPA
-categories: JPA, Spring Data JPA
+categories: JPA
 tags: [JPA, Spring]
 ---
 
