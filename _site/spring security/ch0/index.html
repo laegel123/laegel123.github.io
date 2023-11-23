@@ -1,0 +1,873 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="ko" class="no-js">
+  <head>
+    <!--폰트 : "Nanum Gothic Coding", "Coming Soon"-->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Coming+Soon&family=Nanum+Gothic+Coding&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Coming+Soon&family=Nanum+Gothic+Coding&display=swap">
+
+    <!--폰트 : "Iropke Batang"-->
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css">
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>[Spring Security] Spring Security 란 ? - diary</title>
+<meta name="description" content="Spring Security 란 ? Spring Security 란 Spring 기반의 애플리케이션 보안(인증과 권한, 인가 등) 을 담당해 관련 설정을 쉽게 할 수 있게 도와주는 스프링의 하위 프레임워크이다. Spring Security 는 ‘인증’ 과 ‘권한’ 에 대한 부분을 “Filter“의 흐름 에 따라 처리하고 있다.    인증(Authentication): 해당 사용자가 본인이 맞는지를 확인하는 절차   인가(Authorization): 인증된 사용자가 요청한 자원에 접근 가능한지를 결정하는 절차">
+
+
+  <meta name="author" content="laegel">
+  
+  <meta property="article:author" content="laegel">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="diary">
+<meta property="og:title" content="[Spring Security] Spring Security 란 ?">
+<meta property="og:url" content="http://localhost:4000/spring%20security/ch0/">
+
+
+  <meta property="og:description" content="Spring Security 란 ? Spring Security 란 Spring 기반의 애플리케이션 보안(인증과 권한, 인가 등) 을 담당해 관련 설정을 쉽게 할 수 있게 도와주는 스프링의 하위 프레임워크이다. Spring Security 는 ‘인증’ 과 ‘권한’ 에 대한 부분을 “Filter“의 흐름 에 따라 처리하고 있다.    인증(Authentication): 해당 사용자가 본인이 맞는지를 확인하는 절차   인가(Authorization): 인증된 사용자가 요청한 자원에 접근 가능한지를 결정하는 절차">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2023-07-23T00:00:00+09:00">
+
+
+
+  <meta property="article:modified_time" content="2023-07-23T00:00:00+09:00">
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/spring%20security/ch0/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "laegel",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="diary Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+<link rel="manifest" href="/blog/site.webmanifest">
+<link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          diary
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/index.html">Home</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/">Category</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">토글 메뉴</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/img/logo/android-chrome-192x192.png" alt="laegel" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">laegel</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>반갑습니다. :)</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">팔로우</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Seoul of Republic Korea</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+
+  
+    
+
+<nav class="nav__list">
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">토글 메뉴</label>
+  <ul class="nav__items" id="category_tag_menu">
+      <li>
+            📂 <span style="font-family:'Cafe24Oneprettynight';">전체 글 수</style> <span style="font-family:'Coming Soon';">6</style> <span style="font-family:'Cafe24Oneprettynight';">개</style> 
+      </li>
+      <li>
+          <span class="nav__sub-title">Java</span>
+          <ul>
+              
+                  
+              
+                  
+                      <li><a href="/blog/categories/java-jvm" class="">JVM (3)</a></li>
+                  
+              
+                  
+              
+              
+                  
+              
+                  
+              
+                  
+                      <li><a href="/blog/categories/java-reflection" class="">Reflection (1)</a></li>
+                  
+              
+          </ul>
+          <span class="nav__sub-title">Spring</span>
+          <ul>
+            
+                
+                    <li><a href="/blog/categories/spring-security" class="">Spring Security (2)</a></li>
+                
+            
+                
+            
+                
+            
+          </ul>
+
+
+      </li>
+      <li>	
+            <br>      
+            <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Flaegel123%2Fblog&count_bg=%23D0AADB&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=visitors&edge_flat=false" style="width:100px">
+      </li>
+  </ul>
+</nav>
+
+
+  
+
+  </div>
+
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="[Spring Security] Spring Security 란 ?">
+    <meta itemprop="description" content="Spring Security 란 ?Spring Security 란 Spring 기반의 애플리케이션 보안(인증과 권한, 인가 등) 을 담당해 관련 설정을 쉽게 할 수 있게 도와주는 스프링의 하위 프레임워크이다.Spring Security 는 ‘인증’ 과 ‘권한’ 에 대한 부분을 “Filter“의 흐름 에 따라 처리하고 있다.  인증(Authentication): 해당 사용자가 본인이 맞는지를 확인하는 절차  인가(Authorization): 인증된 사용자가 요청한 자원에 접근 가능한지를 결정하는 절차">
+    <meta itemprop="datePublished" content="2023-07-23T00:00:00+09:00">
+    <meta itemprop="dateModified" content="2023-07-23T00:00:00+09:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/spring%20security/ch0/" class="u-url" itemprop="url">[Spring Security] Spring Security 란 ?
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 분 소요
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+              <ul class="toc__menu"><li><a href="#spring-security-란-">Spring Security 란 ?</a></li><li><a href="#전체적인-동작-흐름">전체적인 동작 흐름</a></li><li><a href="#spring-security-모듈">Spring Security 모듈</a><ul><li><a href="#authentication">Authentication</a></li><li><a href="#securitycontextholder">SecurityContextHolder</a></li><li><a href="#usernamepasswordauthenticationtoken">UsernamePasswordAuthenticationToken</a></li><li><a href="#authenticationprovider">AuthenticationProvider</a></li><li><a href="#authenticationmanager">AuthenticationManager</a></li><li><a href="#userdetails">UserDetails</a></li><li><a href="#userdetailsservice">UserDetailsService</a></li><li><a href="#password-encoding">Password Encoding</a></li><li><a href="#grantedauthority">GrantedAuthority</a></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <h2 id="spring-security-란-">Spring Security 란 ?</h2>
+<p><code class="language-plaintext highlighter-rouge">Spring Security</code> 란 Spring 기반의 애플리케이션 보안(인증과 권한, 인가 등) 을 담당해 관련 설정을 쉽게 할 수 있게 도와주는 스프링의 하위 프레임워크이다.<br />
+<code class="language-plaintext highlighter-rouge">Spring Security</code> 는 ‘인증’ 과 ‘권한’ 에 대한 부분을 “<em>Filter</em>“의 흐름 에 따라 처리하고 있다.</p>
+<ul>
+  <li>인증(Authentication): 해당 사용자가 본인이 맞는지를 확인하는 절차</li>
+  <li>인가(Authorization): 인증된 사용자가 요청한 자원에 접근 가능한지를 결정하는 절차</li>
+</ul>
+
+<h2 id="전체적인-동작-흐름">전체적인 동작 흐름</h2>
+<p><img src="../../assets/img/spring/security01.png" /></p>
+
+<ol>
+  <li>사용자가 로그인 정보와 함께 인증을 요청한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">AuthenticationFilter</code> 가 요청을 가로챈다. 이 때 가로챈 정보를 통해 <code class="language-plaintext highlighter-rouge">UsernamePasswordAuthenticationToken</code> 객체를 생성한다. (사용자가 입력한 데이터를 기반으로 생성한 객체로, 현 상태는 미검증 상태)</li>
+  <li><code class="language-plaintext highlighter-rouge">ProviderManager</code> 에게 토큰 객체를 전달한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">AuthenticationProvider</code> 에게 토큰 객체를 전달한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">UserDetailsService</code> 에게 사용자 정보를 넘겨준다.</li>
+  <li><code class="language-plaintext highlighter-rouge">UserDetailsService</code> 는 실제 넘겨받은 정보를 통해 DB 로부터 사용자 인증 정보를 가져오고 <code class="language-plaintext highlighter-rouge">UserDetails</code> 객체를 생성한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">AuthenticationProvider</code> 는 <code class="language-plaintext highlighter-rouge">UserDetails</code> 객체를 넘겨받고 사용자 정보를 비교하여 인증 여부를 판단한다.</li>
+  <li>인증이 성공적으로 완료되면, 사용자 정보를 담은 <code class="language-plaintext highlighter-rouge">Authentication</code> 객체를 반환한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">AuthenticationFilter</code> 에 <code class="language-plaintext highlighter-rouge">Authentication</code> 객체를 반환한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">Authentication</code> 객체를 <code class="language-plaintext highlighter-rouge">SecurityContext</code> 에 저장한다.</li>
+</ol>
+
+<p>이 과정 중 Spring Security 커스터마이징을 위해 주의깊게 살펴봐야 할 부분은 <code class="language-plaintext highlighter-rouge">UserDetailsService</code> 와 <code class="language-plaintext highlighter-rouge">UserDetails</code> 이다.<br />
+<code class="language-plaintext highlighter-rouge">UserDetailsService</code> 는 <em>loadUserByUsername()</em> 이라는 메서드를 통해 <code class="language-plaintext highlighter-rouge">UserDetails</code> 객체를 반환한다. 반환되는 <code class="language-plaintext highlighter-rouge">UserDetails</code> 를 사용자 입력 정보와 비교함으로써 실질적인 인증 여부가 결정되기 때문에, 이 두 서비스를 어떻게 구현하느냐에 따라
+인증의 세부 과정이 달라지게 된다.</p>
+
+<h2 id="spring-security-모듈">Spring Security 모듈</h2>
+
+<h3 id="authentication">Authentication</h3>
+<p><code class="language-plaintext highlighter-rouge">Authentication</code> 은 현재 접근하는 주체의 정보와 권한을 담는 인터페이스이다. Spring Security 는 사용자 정보 및 인증 성공여부를 가지고 <em>Authentication</em> 객체를 생성하여 <code class="language-plaintext highlighter-rouge">SecurityContext</code> 라는 보관소에 저장한다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Authentication</code> 는 다음과 같은 기능을 제공한다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Authentication</span> <span class="kd">extends</span> <span class="nc">Principal</span><span class="o">,</span> <span class="nc">Serializable</span> <span class="o">{</span>
+
+	<span class="c1">// 현재 사용자의 권한 목록을 가져옴</span>
+	<span class="nc">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">GrantedAuthority</span><span class="o">&gt;</span> <span class="nf">getAuthorities</span><span class="o">();</span>
+
+	<span class="c1">// credentials 를 가져옴 (주로 비밀번호)</span>
+	<span class="nc">Object</span> <span class="nf">getCredentials</span><span class="o">();</span>
+
+	<span class="nc">Object</span> <span class="nf">getDetails</span><span class="o">();</span>
+
+	<span class="nc">Object</span> <span class="nf">getPrincipal</span><span class="o">();</span>
+
+	<span class="c1">// 인증 여부를 가져옴</span>
+	<span class="kt">boolean</span> <span class="nf">isAuthenticated</span><span class="o">();</span>
+
+	<span class="kt">void</span> <span class="nf">setAuthenticated</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">isAuthenticated</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IllegalArgumentException</span><span class="o">;</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="securitycontextholder">SecurityContextHolder</h3>
+<p><img src="../../assets/img/spring/security02.png" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">SecurityContextHolder</code> 는 인증된 사용자 정보(principal)를 담고 있는 <code class="language-plaintext highlighter-rouge">Authentication</code> 객체의 보관소인 <code class="language-plaintext highlighter-rouge">SecurityContext</code> 를 관리하는 객체이다.<br />
+<code class="language-plaintext highlighter-rouge">SecurityContextHolder</code> 의 기본적인 <code class="language-plaintext highlighter-rouge">SecurityContext</code> 객체 저장 방식은 <em>ThreadLocal</em> 로 쓰레드 별로 객체를 저장하고 관리한다. 따라서 멀티 쓰레드 시스템을 사용할 경우 <code class="language-plaintext highlighter-rouge">SecurityContextHolderStategy</code> 인터페이스 구현체를 이용하여 
+객체 저장 전략을 변경하여야 한다.</p>
+
+<h3 id="usernamepasswordauthenticationtoken">UsernamePasswordAuthenticationToken</h3>
+<p><code class="language-plaintext highlighter-rouge">UsernamePasswordAuthenticationToken</code> 토큰은 <em>Authentication</em> 을 구현한 <code class="language-plaintext highlighter-rouge">AbstractAuthenticationToken</code> 의 하위 클래스로 주로 UserId 가 Principal 역할을, Password가 Credential 역할을 담당한다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UsernamePasswordAuthenticationToken</span> <span class="kd">extends</span> <span class="nc">AbstractAuthenticationToken</span> <span class="o">{</span>
+    <span class="c1">// 주로 사용자의 ID에 해당함</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Object</span> <span class="n">principal</span><span class="o">;</span>
+    <span class="c1">// 주로 사용자의 PW에 해당함</span>
+    <span class="kd">private</span> <span class="nc">Object</span> <span class="n">credentials</span><span class="o">;</span>
+    
+    <span class="c1">// 인증 완료 전의 객체 생성</span>
+    <span class="kd">public</span> <span class="nf">UsernamePasswordAuthenticationToken</span><span class="o">(</span><span class="nc">Object</span> <span class="n">principal</span><span class="o">,</span> <span class="nc">Object</span> <span class="n">credentials</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+		<span class="k">this</span><span class="o">.</span><span class="na">principal</span> <span class="o">=</span> <span class="n">principal</span><span class="o">;</span>
+		<span class="k">this</span><span class="o">.</span><span class="na">credentials</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">;</span>
+		<span class="n">setAuthenticated</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+	<span class="o">}</span>
+    
+    <span class="c1">// 인증 완료 후의 객체 생성</span>
+    <span class="kd">public</span> <span class="nf">UsernamePasswordAuthenticationToken</span><span class="o">(</span><span class="nc">Object</span> <span class="n">principal</span><span class="o">,</span> <span class="nc">Object</span> <span class="n">credentials</span><span class="o">,</span>
+			<span class="nc">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">authorities</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">(</span><span class="n">authorities</span><span class="o">);</span>
+		<span class="k">this</span><span class="o">.</span><span class="na">principal</span> <span class="o">=</span> <span class="n">principal</span><span class="o">;</span>
+		<span class="k">this</span><span class="o">.</span><span class="na">credentials</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">;</span>
+		<span class="kd">super</span><span class="o">.</span><span class="na">setAuthenticated</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span> <span class="c1">// must use super, as we override</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractAuthenticationToken</span> <span class="kd">implements</span> <span class="nc">Authentication</span><span class="o">,</span> <span class="nc">CredentialsContainer</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">UsernamePasswordAuthenticationToken</code> 클래스를 구성하고 있는 코드를 보면 두 개의 생성자를 통해 인증 여부를 담고있는 객체를 반환하고 있음을 알 수 있다.</p>
+
+<h3 id="authenticationprovider">AuthenticationProvider</h3>
+<p><code class="language-plaintext highlighter-rouge">AuthenticationProvider</code> 는 실제 인증에 대한 부분을 처리한다. 인증 전의 <code class="language-plaintext highlighter-rouge">Authentication</code> 객체를 받아서 인증이 완료된 객체를 반환하는 역할을 한다.</p>
+
+<h3 id="authenticationmanager">AuthenticationManager</h3>
+<p><code class="language-plaintext highlighter-rouge">AuthenticationManager</code> 인터페이스는 인증이 성공했을 시 사용자 정보를 담은 Authentication 객체를 반환해 <em>SecurityContext</em> 에 저장한다. 그리고 인증 상태를 유지하기 위해 세션에 보관하며, 인증이 실패한 경우 <em>AuthenticationException</em> 을 발생시킨다.</p>
+
+<h3 id="userdetails">UserDetails</h3>
+<p><em>UserDetailService</em> 인터페이스에 의해 <code class="language-plaintext highlighter-rouge">UserDetails</code> 객체가 생성되며, 이 객체는 <em>AuthenticationProvider</em> 에 의해 인증 과정이 실행된다.<br />
+인터페이스를 살펴 보면 아래와 같이 인증된 정보를 반환하는 메서드를 가지고 있음을 알 수 있다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UserDetails</span> <span class="kd">extends</span> <span class="nc">Serializable</span> <span class="o">{</span>
+
+    <span class="nc">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">GrantedAuthority</span><span class="o">&gt;</span> <span class="nf">getAuthorities</span><span class="o">();</span>
+
+    <span class="nc">String</span> <span class="nf">getPassword</span><span class="o">();</span>
+
+    <span class="nc">String</span> <span class="nf">getUsername</span><span class="o">();</span>
+
+    <span class="kt">boolean</span> <span class="nf">isAccountNonExpired</span><span class="o">();</span>
+
+    <span class="kt">boolean</span> <span class="nf">isAccountNonLocked</span><span class="o">();</span>
+
+    <span class="kt">boolean</span> <span class="nf">isCredentialsNonExpired</span><span class="o">();</span>
+
+    <span class="kt">boolean</span> <span class="nf">isEnabled</span><span class="o">();</span>
+    
+<span class="o">}</span>
+</code></pre></div></div>
+<h3 id="userdetailsservice">UserDetailsService</h3>
+
+<p><code class="language-plaintext highlighter-rouge">UserDetailsService</code> 인터페이스는 <em>UserDetails</em> 객체를 반환하는 단 하나의 메서드를 가지고 있는데, 일반적으로 이를 구현한 클래스 내부에 <em>UserRepository</em> 를 주입받아 DB 와 연결해 인증 처리한다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UserDetailsService</span> <span class="o">{</span>
+
+    <span class="nc">UserDetails</span> <span class="nf">loadUserByUsername</span><span class="o">(</span><span class="nc">String</span> <span class="n">var1</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">UsernameNotFoundException</span><span class="o">;</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="password-encoding">Password Encoding</h3>
+<p><em>AuthenticationManagerBuilder.userDetailsService().passwordEncoder()</em> 를 통해 패스워드 암호화에 사용될 <em>PasswordEncoder</em> 구현체를 지정할 수 있다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">AuthenticationManagerBuilder</span> <span class="n">auth</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+	<span class="c1">// TODO Auto-generated method stub</span>
+	<span class="n">auth</span><span class="o">.</span><span class="na">userDetailsService</span><span class="o">(</span><span class="n">userDetailsService</span><span class="o">).</span><span class="na">passwordEncoder</span><span class="o">(</span><span class="n">passwordEncoder</span><span class="o">());</span>
+<span class="o">}</span>
+
+<span class="nd">@Bean</span>
+<span class="kd">public</span> <span class="nc">PasswordEncoder</span> <span class="nf">passwordEncoder</span><span class="o">(){</span>
+	<span class="k">return</span> <span class="k">new</span> <span class="nf">BCryptPasswordEncoder</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="grantedauthority">GrantedAuthority</h3>
+<p><code class="language-plaintext highlighter-rouge">GrantedAuthority</code> 객체는 현재 사용자(Principal) 가 가지고 있는 권한을 의미한다. ROLE_ADMIN, ROLE_USER 와 같이 ROLE_* 의 형태로 사용하며, 보통 “roles” 라고 한다.<br />
+이 객체는 <em>UserDetailsService</em> 에 의해 불러올 수 있고, 특정 자원에 대한 권한이 있는지를 검사하여 접근 허용 여부를 결정한다.</p>
+
+<p><a href="#" class="btn btn--primary align-right">맨 위로 이동하기</a></p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 태그: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#spring-security" class="page__taxonomy-item p-category" rel="tag">Spring Security</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> 카테고리: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#spring-security" class="page__taxonomy-item p-category" rel="tag">Spring Security</a>
+    
+    </span>
+  </p>
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 업데이트:</strong> <time class="dt-published" datetime="2023-07-23">July 23, 2023</time></p>
+
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">공유하기</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=%5BSpring+Security%5D+Spring+Security+%EB%9E%80+%3F%20http%3A%2F%2Flocalhost%3A4000%2Fspring%2520security%2Fch0%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fspring%2520security%2Fch0%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2Fspring%2520security%2Fch0%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+
+
+  
+
+  
+  
+  
+    
+    
+    
+
+
+  <nav class="pagination_prev_next">
+    
+      <a href="#" class="pagination_prev_next--pager disabled">첫 번째 글입니다</a>
+    
+    
+      <a href="/blog/spring%20security/ch1/" class="pagination_prev_next--pager"><span class="prev_next">다음 글  &nbsp  </span>[Spring Security] Spring Security + JWT 구현</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">참고</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/spring%20security/ch1/" rel="permalink">[Spring Security] Spring Security + JWT 구현
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">개인 프로젝트 진행을 위해 세팅한 환경 일부를 기록한 글이다.
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/reflection/ch0/" rel="permalink">[Java] 리플렉션(Reflection) 알아보기
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          최대 1 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">리플렉션(Reflection) 이란 ?
+리플렉션 은 구체적인 클래스 타입을 알지 못하더라도 그 클래스의 메서드, 타입, 변수들에 접근할 수 있도록 도와주는 자바 API를 말한다. 이 프로그래밍 기법은 런타임 시점에 동적으로 특정 클래스의 정보를 추출할 수 있게 도와줘 프로그램에 유...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch2/" rel="permalink">[JVM] JVM 총정리 - 실행 엔진(3)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">실행 엔진은 Runtime Data Area 에 적재된 바이트코드들을 실행하고 사용되지 않는 데이터들을 제거하는 역할을 하며 세 가지 장치로 구분된다.
+
+  인터프리터(Interpreter)
+  JIT Compiler
+  Garbage Collector
+
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch1/" rel="permalink">[JVM] JVM 총정리 - 런타임 영역(2)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">런타임 영역 은 JVM 이 런타임 환경에서 자바 프로그램을 수행할 때 OS 로부터 할당받는 메모리 영역이다. 이 메모리 영역은 논리적으로 다음과 같이 5가지 영역으로 구분한다.
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>팔로우:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> 피드</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 laegel. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+    <script>
+  'use strict';
+
+  (function() {
+    var commentContainer = document.querySelector('#utterances-comments');
+
+    if (!commentContainer) {
+      return;
+    }
+
+    var script = document.createElement('script');
+    script.setAttribute('src', 'https://utteranc.es/client.js');
+    script.setAttribute('repo', 'laegel123/blog');
+    script.setAttribute('issue-term', 'pathname');
+    
+    script.setAttribute('theme', 'github-light');
+    script.setAttribute('crossorigin', 'anonymous');
+
+    commentContainer.appendChild(script);
+  })();
+</script>
+
+  
+
+
+
+
+
+  </body>
+</html>

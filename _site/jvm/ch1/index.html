@@ -1,0 +1,843 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="ko" class="no-js">
+  <head>
+    <!--폰트 : "Nanum Gothic Coding", "Coming Soon"-->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Coming+Soon&family=Nanum+Gothic+Coding&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Coming+Soon&family=Nanum+Gothic+Coding&display=swap">
+
+    <!--폰트 : "Iropke Batang"-->
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css">
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>[JVM] JVM 총정리 - 런타임 영역(2) - diary</title>
+<meta name="description" content="런타임 영역 은 JVM 이 런타임 환경에서 자바 프로그램을 수행할 때 OS 로부터 할당받는 메모리 영역이다. 이 메모리 영역은 논리적으로 다음과 같이 5가지 영역으로 구분한다.">
+
+
+  <meta name="author" content="laegel">
+  
+  <meta property="article:author" content="laegel">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="diary">
+<meta property="og:title" content="[JVM] JVM 총정리 - 런타임 영역(2)">
+<meta property="og:url" content="http://localhost:4000/jvm/ch1/">
+
+
+  <meta property="og:description" content="런타임 영역 은 JVM 이 런타임 환경에서 자바 프로그램을 수행할 때 OS 로부터 할당받는 메모리 영역이다. 이 메모리 영역은 논리적으로 다음과 같이 5가지 영역으로 구분한다.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2023-08-07T00:00:00+09:00">
+
+
+
+  <meta property="article:modified_time" content="2023-08-07T00:00:00+09:00">
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/jvm/ch1/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "laegel",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="diary Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+<link rel="manifest" href="/blog/site.webmanifest">
+<link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          diary
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/index.html">Home</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/">Category</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">토글 메뉴</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/img/logo/android-chrome-192x192.png" alt="laegel" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">laegel</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>반갑습니다. :)</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">팔로우</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Seoul of Republic Korea</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+
+  
+    
+
+<nav class="nav__list">
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">토글 메뉴</label>
+  <ul class="nav__items" id="category_tag_menu">
+      <li>
+            📂 <span style="font-family:'Cafe24Oneprettynight';">전체 글 수</style> <span style="font-family:'Coming Soon';">6</style> <span style="font-family:'Cafe24Oneprettynight';">개</style> 
+      </li>
+      <li>
+          <span class="nav__sub-title">Java</span>
+          <ul>
+              
+                  
+              
+                  
+                      <li><a href="/blog/categories/java-jvm" class="">JVM (3)</a></li>
+                  
+              
+                  
+              
+              
+                  
+              
+                  
+              
+                  
+                      <li><a href="/blog/categories/java-reflection" class="">Reflection (1)</a></li>
+                  
+              
+          </ul>
+          <span class="nav__sub-title">Spring</span>
+          <ul>
+            
+                
+                    <li><a href="/blog/categories/spring-security" class="">Spring Security (2)</a></li>
+                
+            
+                
+            
+                
+            
+          </ul>
+
+
+      </li>
+      <li>	
+            <br>      
+            <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Flaegel123%2Fblog&count_bg=%23D0AADB&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=visitors&edge_flat=false" style="width:100px">
+      </li>
+  </ul>
+</nav>
+
+
+  
+
+  </div>
+
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="[JVM] JVM 총정리 - 런타임 영역(2)">
+    <meta itemprop="description" content="런타임 영역 은 JVM 이 런타임 환경에서 자바 프로그램을 수행할 때 OS 로부터 할당받는 메모리 영역이다. 이 메모리 영역은 논리적으로 다음과 같이 5가지 영역으로 구분한다.">
+    <meta itemprop="datePublished" content="2023-08-07T00:00:00+09:00">
+    <meta itemprop="dateModified" content="2023-08-07T00:00:00+09:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/jvm/ch1/" class="u-url" itemprop="url">[JVM] JVM 총정리 - 런타임 영역(2)
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          4 분 소요
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+              <ul class="toc__menu"><li><a href="#method-area">Method Area</a><ul><li><a href="#perm-영역의-역할">Perm 영역의 역할</a><ul><li><a href="#1-type-information">1. Type Information</a></li><li><a href="#2-runtime-constant-pool">2. Runtime Constant Pool</a></li><li><a href="#3-field-information">3. Field Information</a></li><li><a href="#4-method-information">4. Method Information</a></li><li><a href="#5-class-variable">5. Class Variable</a></li></ul></li><li><a href="#perm-영역의-한계">Perm 영역의 한계</a><ul><li><a href="#metaspace-영역의-등장">Metaspace 영역의 등장</a></li></ul></li></ul></li><li><a href="#heap-area">Heap Area</a><ul><li><a href="#hotspot-jvm-의-heap-area-구조">Hotspot JVM 의 Heap Area 구조</a></li></ul></li><li><a href="#pc-register">PC Register</a></li><li><a href="#jvm-stack">JVM Stack</a></li><li><a href="#native-method-stack">Native Method Stack</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p><code class="language-plaintext highlighter-rouge">런타임 영역</code> 은 JVM 이 런타임 환경에서 자바 프로그램을 수행할 때 OS 로부터 할당받는 메모리 영역이다. 이 메모리 영역은 논리적으로 다음과 같이 5가지 영역으로 구분한다.</p>
+
+<ul>
+  <li>Method Area</li>
+  <li>Heap Area</li>
+  <li>PC Register</li>
+  <li>Native Method Stack</li>
+  <li>JVM Stack</li>
+</ul>
+
+<hr />
+
+<h2 id="method-area">Method Area</h2>
+<p><code class="language-plaintext highlighter-rouge">Method Area</code> 는 JVM 벤더마다 다르게 구현되어 있다. 그러나 거의 모든 운영체제에서는 Hotspot 이라는 벤더를 사용하므로 이것을 기준으로 설명할 것이다.</p>
+
+<p>Hotspot JVM 벤더는 JDK 8 버전 기준으로 메모리 영역에 변화가 생겼다. 크게는 기존 Perm 영역(Perm Generation) 이 사라지고 Metaspace 영역이 등장하게 된 것인데, Method Area 가 JVM 에서 어떤 역할을 하는지, JDK 8 버전이 되며 어떤 변화가 생겼는지 알아보자.</p>
+
+<h3 id="perm-영역의-역할">Perm 영역의 역할</h3>
+<p><img src="../../assets/img/java/jvm04.png" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">Perm 영역</code> 은 런타임 환경에서 클래스 로더를 통해 로드된 클래스와 메서드의 메타 데이터가 저정되는 영역이다. 전역 변수나 static 변수 또한 이 영역에 저장되고 프로그램이 종료될 때까지 남아있게 된다. 또한 해당 정보에 대한 요청이 오면 실제 
+물리 메모리 주소로 변환할 수 있게 하는 영역이다.</p>
+
+<p>이 영역에 저장되는 데이터르 좀 더 세부화하자면 다음과 같다.</p>
+
+<h4 id="1-type-information">1. Type Information</h4>
+<ul>
+  <li>클래스와 인터페이스 정보를 뜻한다. 다음과 같은 분류에 따라 정보를 저장한다.
+    <ul>
+      <li>Type 명: Package name + Class name 형식</li>
+      <li>Type 종류: Type 이 Class 인지 Interface 인지에 대한 정보</li>
+      <li>Type 의 제어자: 접근 제어자, 제어자 에 대한 정보</li>
+      <li>연관된 Interface 정보: 사용된 Interface 의 정보</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="2-runtime-constant-pool">2. Runtime Constant Pool</h4>
+<ul>
+  <li>Type 의 상수 정보를 저장하는 영역이다. 각 상수는 인덱스를 통해 접근이 가능하다. 또한 method, field, type 으로 접근하기 위한 reference 정보가 저장되기 때문에 독자적인 중요성이 있다.</li>
+</ul>
+
+<h4 id="3-field-information">3. Field Information</h4>
+<ul>
+  <li>인스턴스 변수의 정보를 저장한다.</li>
+</ul>
+
+<h4 id="4-method-information">4. Method Information</h4>
+<ul>
+  <li>메서드의 모든 정보를 저장한다.</li>
+</ul>
+
+<h4 id="5-class-variable">5. Class Variable</h4>
+<ul>
+  <li>static 키워드로 선언된 변수가 저장된다.</li>
+</ul>
+
+<h3 id="perm-영역의-한계">Perm 영역의 한계</h3>
+<p><code class="language-plaintext highlighter-rouge">Perm 영역</code> 은 논리적으로 Method Area 에 속해있지만, 사실 Perm 영역은 Heap Area 내에서 분리된 특수한 공간에 위치한다. 때문에 처음 JVM 에 의해 메모리가 할당이 될 때 영역의 크기가 제한적으로 할당될 수밖에 없고, 이로 인해 런타임 환경에서 
+OutOfMemory 에러 유발 문제와 GC 를 수시로 해줘야 하는 메모리 누수가 유발된다. 이러한 문제들로 인해 JDK 버전이 8로 올라감에 따라 Perm 영역이 제거되고 Metasapce 영역이 새롭게 등장하게 된다.</p>
+
+<h4 id="metaspace-영역의-등장">Metaspace 영역의 등장</h4>
+<p>Perm 영역과 비교해 <code class="language-plaintext highlighter-rouge">Metaspace 영역</code>의 가장 중요한 차이점은 ‘<strong>메모리 할당을 처리하는 방법</strong>‘이 달라졌다는 것이다.<br />
+<code class="language-plaintext highlighter-rouge">Metaspace 영역</code> 은 Native Memory 영역으로 전환되었다. 또한 OS 에 의해 메모리 할당 공간이 자동으로 조절되게끔 바뀌면서 이론상 아키텍쳐가 지원하는 메모리 크기까지 확장할 수 있게 되었다. 따라서 Perm 영역과 비교해 메모리 공간 확보 기능이 향상되었고 
+보다 유연하고 안정적인 메모리 사용을 제공할 수 있게 되었다. 또한 Method Area 이면서 애매하게 Heap Area 에 속해있던 과거와 달리 명확하게 Heap Area 영역과 독립된 개념으로 존재할 수 있게 되었다.</p>
+
+<p>다음으로 중요한 변경점은 ‘<strong>string 과 static object 의 저장 방법</strong>’ 이다.
+먼저, string 값 저장 방식의 변경은 다음과 같다.<br />
+JDK 8 버전 이하에서 문자열 리터럴 방식을 통해 생성하는 string 값은 Runtime Constant Pool 에 저장되었다. 그러나 JDK 8 버전 이후 Runtime Constant Pool 에서 String Constant Pool 이라는 개념이 별도로 분리되어 Heap Area 에 저장되게 변경되었다.
+이로 인해 string 리터럴 값이 GC 의 대상이 될 수 있어 메모리 관리가 좀 더 효율적으로 이루어 질 수 있게 되었다.</p>
+
+<p>static object 도 마찬가지로 비슷하게 변경되었다.<br />
+기존 Perm 영역에서는 static object 가 Perm 영역에 저장되어 GC 의 대상이 되지 않았지만, JDK 8 버전 이후 Heap Area 에 저장되도록 변경되었고, reference 값만 Metaspace 에서 관리하게 함으로써 사용되지 않는 static object 는 GC 의 대상이 될 수 있게 되었다.</p>
+
+<h2 id="heap-area">Heap Area</h2>
+<p><code class="language-plaintext highlighter-rouge">Heap Area</code> 는 Object 클래스를 상속받는 모든 객체들(클래스 인스턴스)과 해당 인스턴스 변수들을 담는 공간이다. 이곳에서는 실제 데이터를 가진 인스턴스와 배열 뿐만 아니라 문자열에 대한 정보를 가진 String Constant Pool(JDK 8 이후) 등이 저장된다.</p>
+
+<p>이 영역은 JVM 당 하나만 생성이 되며, 해당 영역이 가진 데이터는 모든 JVM Stack 영역에서 참조되어 thread 간 공유되기 때문에 같은 애플리케이션을 사용하는 thread 사이에서 인스턴스를 공유하는 경우 동기화 문제가 수반될 수 있다. 또한 참조되지 않는 
+인스턴스와 배열에 대한 정보를 얻을 수 있기 때문에 GC 의 주 대상이 되는 영역이다.</p>
+
+<h3 id="hotspot-jvm-의-heap-area-구조">Hotspot JVM 의 Heap Area 구조</h3>
+<p>앞서 설명한 이유와 마찬가지로 Hotspot 모델을 기반으로 한 HEAP Area 영역에 대해 살펴보자.
+<img src="../../assets/img/java/jvm05.png" /></p>
+
+<p>Hotspot JVM 은 크게 Yong 영역과 Old 영역으로 나뉘어져 있다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Yong 영역</code>은 객체가 새로 생성되면 할당되는 영역으로, 상태에 따라 Eden, Servior0, Servior1 영역으로 구분되어 저장된다.<br />
+대부분의 객체가 금방 Unreachable 상태가 되기 때문에 (어떠한 경우에도 절대 실행되지 않는 상태), 많은 객체가 이 영역에서 생성되었다가 사라진다. 이 영역에서 발생하는 GC 를 Minor GC 라고 부른다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Old 영역</code>은 Yong 영역에서 Reachable 상태를 유지하며 살아남은 객체가 복사되는 영역이다. 계속해서 사용되는 객체들이 저장되는 공간이기 때문에 Yong 영역보다 크게 할당되며 GC 작업 시간이 Minor GC 보다 훨씬 오래 걸린다.<br />
+이 영역에서 일어나는 GC를 Major GC 라 부른다.</p>
+
+<h2 id="pc-register">PC Register</h2>
+<p><code class="language-plaintext highlighter-rouge">PC Register</code> 는 쓰레드가 현재 실행중인 메서드의 명령을 담고 있는 JVM 명령어 주소를 저장한다.</p>
+
+<p>명령어가 자바 메서드를 수행하고 있다면 JVM 명령어의 주소를 저장하지만, 만약 다른 언어의 메서들를 수행한다면 UNDEFINED 상태가 되고, 다른 언어의 메서드는 뒤에 설명할 Native Method Stack Srea 에서 수행하게 된다.</p>
+
+<h2 id="jvm-stack">JVM Stack</h2>
+<p><code class="language-plaintext highlighter-rouge">JVM Stack</code> 은 메서드를 호출할 때마다 frame 이라는 단위의 정보를 push(추가) 하고 메서드가 종료되면 해당 frame을 pop(제거) 하는 동작을 수행한다. 이런 특징으로 자바에서 변수는 선언된 블록 안에서만 유효하고, 블록을 벗어나면 스택에서 제거되어 알 수 없게 된다.</p>
+
+<p>frame 은 다음 3가지로 구성된다.</p>
+<ul>
+  <li>Local Variable: 메서드의 지역 변수들을 갖는다.</li>
+  <li>Operand Stack: 메서드 내 계산을 위한 작업 공간이다. 바이트 코드 명령문들이 들어있는 공간이라고 할 수 있다.</li>
+  <li>Constant Pool Reference: Constant Pool 참조를 위한 공간이다.</li>
+</ul>
+
+<h2 id="native-method-stack">Native Method Stack</h2>
+<p>프로그램을 실행하다 보면 경우에 따라서는 순수하게 JAVA로 구성된 코드만을 사용할 수 없는 시스템의 자원이나 API가 존재한다. 이러한 다른 프로그래밍 언어로 작성된 메서드들을 native method 라고 하는데, Native Method Stack 은 이런 native method 
+들을 다루는 영역이다.</p>
+
+<p>기본 동작 과정은 다음과 같다.
+<img src="../../assets/img/java/jvm06.png" /></p>
+
+<p>일반적인 메서드가 실행될 때 해당 frame 들이 JVM Stack 에 쌓이며 실행이 되다가 native method 를 만나면 해당 메서드를 Native Method Stack Area 에 쌓고 수행이 끝난 뒤 다시 JVM Stack 으로 돌아오게 된다. 이 때, native method 를 호출한 
+stack frame 으로 돌아가는 것이 아닌 새로운 stack frame 을 생성하여 다시 작업을 수행하게 된다. 그렇기 때문에 native code 로 되어있는 함수의 호출을 자바 프로그램 내에서 직접 수행할 수 있고, 그 결과를 받아올 수 있는 것이다.</p>
+
+<p>결과적으로 JVM 은 Native Stack Frame 영역을 통해 JNI(Java Native Interface) 방식을 지원한다고 할 수 있겠다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>여기서 JNI(Java Native Interface) 란 다른 언어로 작성된 라이브러리들을 호출하거나 반대로 호출되는 것을 가능하게 하는 프로그래밍 프레임워크를 말한다.
+</code></pre></div></div>
+
+<p><a href="#" class="btn btn--primary align-right">맨 위로 이동하기</a></p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 태그: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#java" class="page__taxonomy-item p-category" rel="tag">Java</a><span class="sep">, </span>
+    
+      <a href="/tags/#jvm" class="page__taxonomy-item p-category" rel="tag">JVM</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> 카테고리: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#jvm" class="page__taxonomy-item p-category" rel="tag">JVM</a>
+    
+    </span>
+  </p>
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 업데이트:</strong> <time class="dt-published" datetime="2023-08-07">August 7, 2023</time></p>
+
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">공유하기</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=%5BJVM%5D+JVM+%EC%B4%9D%EC%A0%95%EB%A6%AC+-+%EB%9F%B0%ED%83%80%EC%9E%84+%EC%98%81%EC%97%AD%282%29%20http%3A%2F%2Flocalhost%3A4000%2Fjvm%2Fch1%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fjvm%2Fch1%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2Fjvm%2Fch1%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+
+
+  
+
+  
+  
+  
+    
+    
+    
+
+
+  <nav class="pagination_prev_next">
+    
+      <a href="/blog/jvm/ch0/" class="pagination_prev_next--pager"><span class="prev_next">이전 글  &nbsp</span>[JVM] JVM 총정리 - 클래스 로더(1)</a>
+    
+    
+      <a href="/blog/jvm/ch2/" class="pagination_prev_next--pager"><span class="prev_next">다음 글  &nbsp  </span>[JVM] JVM 총정리 - 실행 엔진(3)</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">참고</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/spring%20security/ch1/" rel="permalink">[Spring Security] Spring Security + JWT 구현
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">개인 프로젝트 진행을 위해 세팅한 환경 일부를 기록한 글이다.
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/reflection/ch0/" rel="permalink">[Java] 리플렉션(Reflection) 알아보기
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          최대 1 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">리플렉션(Reflection) 이란 ?
+리플렉션 은 구체적인 클래스 타입을 알지 못하더라도 그 클래스의 메서드, 타입, 변수들에 접근할 수 있도록 도와주는 자바 API를 말한다. 이 프로그래밍 기법은 런타임 시점에 동적으로 특정 클래스의 정보를 추출할 수 있게 도와줘 프로그램에 유...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch2/" rel="permalink">[JVM] JVM 총정리 - 실행 엔진(3)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">실행 엔진은 Runtime Data Area 에 적재된 바이트코드들을 실행하고 사용되지 않는 데이터들을 제거하는 역할을 하며 세 가지 장치로 구분된다.
+
+  인터프리터(Interpreter)
+  JIT Compiler
+  Garbage Collector
+
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch0/" rel="permalink">[JVM] JVM 총정리 - 클래스 로더(1)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          4 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">JVM 은 사용자 컴퓨터 운영체제에 맞는 JRE 에 포함되어 있는 소프트웨어로, 바이트 코드로 변환된 자바 코드를 실행시켜주는 역할을 한다. 또한 자바 프로그램을 실행함에 있어 .class 파일에 대한 유효성 검사와 메모리 관리, GC 등의 작업을 수행하기 때문에 매우 중요한 소프...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>팔로우:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> 피드</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 laegel. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+    <script>
+  'use strict';
+
+  (function() {
+    var commentContainer = document.querySelector('#utterances-comments');
+
+    if (!commentContainer) {
+      return;
+    }
+
+    var script = document.createElement('script');
+    script.setAttribute('src', 'https://utteranc.es/client.js');
+    script.setAttribute('repo', 'laegel123/blog');
+    script.setAttribute('issue-term', 'pathname');
+    
+    script.setAttribute('theme', 'github-light');
+    script.setAttribute('crossorigin', 'anonymous');
+
+    commentContainer.appendChild(script);
+  })();
+</script>
+
+  
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,1206 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="ko" class="no-js">
+  <head>
+    <!--폰트 : "Nanum Gothic Coding", "Coming Soon"-->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Coming+Soon&family=Nanum+Gothic+Coding&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Coming+Soon&family=Nanum+Gothic+Coding&display=swap">
+
+    <!--폰트 : "Iropke Batang"-->
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css">
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>[Spring Security] Spring Security + JWT 구현 - diary</title>
+<meta name="description" content="개인 프로젝트 진행을 위해 세팅한 환경 일부를 기록한 글이다.">
+
+
+  <meta name="author" content="laegel">
+  
+  <meta property="article:author" content="laegel">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="diary">
+<meta property="og:title" content="[Spring Security] Spring Security + JWT 구현">
+<meta property="og:url" content="http://localhost:4000/spring%20security/ch1/">
+
+
+  <meta property="og:description" content="개인 프로젝트 진행을 위해 세팅한 환경 일부를 기록한 글이다.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2023-08-08T00:00:00+09:00">
+
+
+
+  <meta property="article:modified_time" content="2023-08-08T00:00:00+09:00">
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/spring%20security/ch1/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "laegel",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="diary Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+<link rel="manifest" href="/blog/site.webmanifest">
+<link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          diary
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/index.html">Home</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/">Category</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">토글 메뉴</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/img/logo/android-chrome-192x192.png" alt="laegel" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">laegel</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>반갑습니다. :)</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">팔로우</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Seoul of Republic Korea</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+
+  
+    
+
+<nav class="nav__list">
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">토글 메뉴</label>
+  <ul class="nav__items" id="category_tag_menu">
+      <li>
+            📂 <span style="font-family:'Cafe24Oneprettynight';">전체 글 수</style> <span style="font-family:'Coming Soon';">6</style> <span style="font-family:'Cafe24Oneprettynight';">개</style> 
+      </li>
+      <li>
+          <span class="nav__sub-title">Java</span>
+          <ul>
+              
+                  
+              
+                  
+                      <li><a href="/blog/categories/java-jvm" class="">JVM (3)</a></li>
+                  
+              
+                  
+              
+              
+                  
+              
+                  
+              
+                  
+                      <li><a href="/blog/categories/java-reflection" class="">Reflection (1)</a></li>
+                  
+              
+          </ul>
+          <span class="nav__sub-title">Spring</span>
+          <ul>
+            
+                
+                    <li><a href="/blog/categories/spring-security" class="">Spring Security (2)</a></li>
+                
+            
+                
+            
+                
+            
+          </ul>
+
+
+      </li>
+      <li>	
+            <br>      
+            <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Flaegel123%2Fblog&count_bg=%23D0AADB&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=visitors&edge_flat=false" style="width:100px">
+      </li>
+  </ul>
+</nav>
+
+
+  
+
+  </div>
+
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="[Spring Security] Spring Security + JWT 구현">
+    <meta itemprop="description" content="개인 프로젝트 진행을 위해 세팅한 환경 일부를 기록한 글이다.">
+    <meta itemprop="datePublished" content="2023-08-08T00:00:00+09:00">
+    <meta itemprop="dateModified" content="2023-08-08T00:00:00+09:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/spring%20security/ch1/" class="u-url" itemprop="url">[Spring Security] Spring Security + JWT 구현
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 분 소요
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+              <ul class="toc__menu"><li><a href="#jwtjson-web-token-란-">JWT(JSON Web Token) 란 ?</a></li><li><a href="#refresh-token-정책-수립">Refresh Token 정책 수립</a><ul><li><a href="#token-재발급-시나리오">Token 재발급 시나리오</a></li></ul></li><li><a href="#서버-환경buildgradle">서버 환경(build.gradle)</a></li><li><a href="#tokenprovider">TokenProvider</a><ul><li><a href="#generatetokendto">generateTokenDto()</a></li><li><a href="#getauthentication">getAuthentication()</a></li><li><a href="#validationtoken">validationToken()</a></li><li><a href="#parseclaims">parseClaims()</a></li></ul></li><li><a href="#jwtfilter">JwtFilter</a><ul><li><a href="#resolvetoken">resolveToken()</a></li><li><a href="#dofilterinternal">doFilterInternal()</a></li></ul></li><li><a href="#jwtauthenticationentrypoint">JwtAuthenticationEntryPoint</a></li><li><a href="#jwtaccessdeniedhandler">JwtAccessDeniedHandler</a></li><li><a href="#jwtsecurityconfig">JwtSecurityConfig</a></li><li><a href="#websecurityconfig">WebSecurityConfig</a></li><li><a href="#securityutil">SecurityUtil</a></li><li><a href="#tokendto">TokenDto</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>개인 프로젝트 진행을 위해 세팅한 환경 일부를 기록한 글이다.</p>
+
+<h2 id="jwtjson-web-token-란-">JWT(JSON Web Token) 란 ?</h2>
+<p><code class="language-plaintext highlighter-rouge">JWT</code> 란 JSON 객체를 사용해서 토큰 자체에 정보를 저장하는 Web Token 이다. Header, Payload, Signature 3 개의 부분으로 구성되어 있으며, 쿠키나 세션을 이용한 인증보다 안전하고 효율적이다. 다만, 서버에서 관리하지 않다보니 탈취당한 경우 대처가 
+어려운 단점이 존재한다. 이를 위해 토큰의 유효시간을 짧게 가져가고 refresh token 을 발급하는 정책을 사용하는 것이 올바르다.</p>
+
+<h2 id="refresh-token-정책-수립">Refresh Token 정책 수립</h2>
+<p>해당 프로젝트 환경의 Refresh Token 정책은 다음과 같다<br />
+서버는 Access Token 이 만료된 사용자가 재발급을 원할 경우 사용자의 정보를 확인하고 Refresh Token 이 만료되지 않았다면 새로운 토큰을 발급해준다.</p>
+
+<h3 id="token-재발급-시나리오">Token 재발급 시나리오</h3>
+<ol>
+  <li>클라이언트가 Access Token 을 통해 API 요청</li>
+  <li>Access Token 이 만료된 경우 서버에서 Access Token 만료 응답 반환</li>
+  <li>클라이언트는 만료 응답을 받고 재발급을 위해 Access Token + Refresh Token 을 재전송</li>
+  <li>서버는 Refresh Token 의 만료 여부 확인</li>
+  <li>서버에서 Access Token 으로  유저 정보를 획득하고 별도 저장소에서 해당 유저 정보를 가져와 Refresh Token 과 일치하는 지 확인</li>
+  <li>검증이 끝나면 새로운 토큰 발급 (Access Token + Refresh Token)</li>
+  <li>서버에서 Refresh Token 저장소 정보 업데이트</li>
+</ol>
+
+<h2 id="서버-환경buildgradle">서버 환경(build.gradle)</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.2'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+}
+
+group = 'laegel'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Querydsl 추가
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	implementation "net.coobird:thumbnailator:0.4.8"
+
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
+	implementation 'com.google.code.gson:gson:2.8.9'
+
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+	compileOnly 'org.projectlombok:lombok'
+	//runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+///querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+
+//querydsl 추가 끝
+compileQuerydsl.doFirst {
+	if (file(querydslDir).exists()) {
+		delete(file(querydslDir))
+	}
+}
+
+</code></pre></div></div>
+
+<h2 id="tokenprovider">TokenProvider</h2>
+
+<p>path: /common/jwt/TokenProvider</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">laegel.nailart.common.jwt</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.jsonwebtoken.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.jsonwebtoken.io.Decoders</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.jsonwebtoken.security.Keys</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">laegel.nailart.common.dto.TokenDto</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Value</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.authentication.UsernamePasswordAuthenticationToken</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.Authentication</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.GrantedAuthority</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.authority.SimpleGrantedAuthority</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.userdetails.User</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.userdetails.UserDetails</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.security.Key</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Collection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Date</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.stream.Collectors</span><span class="o">;</span>
+
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TokenProvider</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">AUTHORITIES_KEY</span> <span class="o">=</span> <span class="s">"auth"</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">BEARER_TYPE</span> <span class="o">=</span> <span class="s">"bearer"</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="no">ACCESS_TOKEN_EXPIRE_TIME</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">30</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Key</span> <span class="n">key</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">TokenProvider</span><span class="o">(</span><span class="nd">@Value</span><span class="o">(</span><span class="s">"${jwt.secret}"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">secretKey</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">keyBytes</span> <span class="o">=</span> <span class="nc">Decoders</span><span class="o">.</span><span class="na">BASE64</span><span class="o">.</span><span class="na">decode</span><span class="o">(</span><span class="n">secretKey</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">key</span> <span class="o">=</span> <span class="nc">Keys</span><span class="o">.</span><span class="na">hmacShaKeyFor</span><span class="o">(</span><span class="n">keyBytes</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 토큰 생성</span>
+    <span class="kd">public</span> <span class="nc">TokenDto</span> <span class="nf">generateTokenDto</span><span class="o">(</span><span class="nc">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="nc">String</span> <span class="n">authorities</span> <span class="o">=</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getAuthorities</span><span class="o">().</span><span class="na">stream</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">GrantedAuthority:</span><span class="o">:</span><span class="n">getAuthority</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">joining</span><span class="o">(</span><span class="s">","</span><span class="o">));</span>
+
+        <span class="kt">long</span> <span class="n">now</span> <span class="o">=</span> <span class="o">(</span><span class="k">new</span> <span class="nc">Date</span><span class="o">()).</span><span class="na">getTime</span><span class="o">();</span>
+
+        <span class="nc">Date</span> <span class="n">tokenExpiresIn</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Date</span><span class="o">(</span><span class="n">now</span> <span class="o">+</span> <span class="no">ACCESS_TOKEN_EXPIRE_TIME</span><span class="o">);</span>
+
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">tokenExpiresIn</span><span class="o">);</span>
+
+        <span class="nc">String</span> <span class="n">accessToken</span> <span class="o">=</span> <span class="nc">Jwts</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">setSubject</span><span class="o">(</span><span class="n">authentication</span><span class="o">.</span><span class="na">getName</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">claim</span><span class="o">(</span><span class="no">AUTHORITIES_KEY</span><span class="o">,</span> <span class="n">authorities</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">setExpiration</span><span class="o">(</span><span class="n">tokenExpiresIn</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">signWith</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="nc">SignatureAlgorithm</span><span class="o">.</span><span class="na">HS512</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">compact</span><span class="o">();</span>
+
+        <span class="k">return</span> <span class="nc">TokenDto</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">grantType</span><span class="o">(</span><span class="no">BEARER_TYPE</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">accessToken</span><span class="o">(</span><span class="n">accessToken</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">tokenExpiresIn</span><span class="o">(</span><span class="n">tokenExpiresIn</span><span class="o">.</span><span class="na">getTime</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Authentication</span> <span class="nf">getAuthentication</span><span class="o">(</span><span class="nc">String</span> <span class="n">accessToken</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Claims</span> <span class="n">claims</span> <span class="o">=</span> <span class="n">parseClaims</span><span class="o">(</span><span class="n">accessToken</span><span class="o">);</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">claims</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="no">AUTHORITIES_KEY</span><span class="o">)</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">"권한 정보가 없는 토큰입니다."</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="nc">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">authorities</span> <span class="o">=</span>
+                <span class="nc">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="n">claims</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="no">AUTHORITIES_KEY</span><span class="o">).</span><span class="na">toString</span><span class="o">().</span><span class="na">split</span><span class="o">(</span><span class="s">","</span><span class="o">))</span>
+                        <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">SimpleGrantedAuthority:</span><span class="o">:</span><span class="k">new</span><span class="o">).</span><span class="na">toList</span><span class="o">();</span>
+
+        <span class="nc">UserDetails</span> <span class="n">principal</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">(</span><span class="n">claims</span><span class="o">.</span><span class="na">getSubject</span><span class="o">(),</span> <span class="s">""</span><span class="o">,</span> <span class="n">authorities</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">UsernamePasswordAuthenticationToken</span><span class="o">(</span><span class="n">principal</span><span class="o">,</span> <span class="s">""</span><span class="o">,</span> <span class="n">authorities</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">validateToken</span><span class="o">(</span><span class="nc">String</span> <span class="n">token</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">Jwts</span><span class="o">.</span><span class="na">parserBuilder</span><span class="o">().</span><span class="na">setSigningKey</span><span class="o">(</span><span class="n">key</span><span class="o">).</span><span class="na">build</span><span class="o">().</span><span class="na">parseClaimsJws</span><span class="o">(</span><span class="n">token</span><span class="o">);</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">io</span><span class="o">.</span><span class="na">jsonwebtoken</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">SecurityException</span> <span class="o">|</span> <span class="nc">MalformedJwtException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// TODO 후에 로그로 변경할 것</span>
+            <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"잘못된 JWT 서명입니다."</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">ExpiredJwtException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"만료된 JWT 토큰입니다."</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">UnsupportedJwtException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"지원되지 않는 JWT 토큰입니다."</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IllegalArgumentException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"JWT 토큰이 잘못되었습니다."</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="nc">Claims</span> <span class="nf">parseClaims</span><span class="o">(</span><span class="nc">String</span> <span class="n">accessToken</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="nc">Jwts</span><span class="o">.</span><span class="na">parserBuilder</span><span class="o">().</span><span class="na">setSigningKey</span><span class="o">(</span><span class="n">key</span><span class="o">).</span><span class="na">build</span><span class="o">().</span><span class="na">parseClaimsJws</span><span class="o">(</span><span class="n">accessToken</span><span class="o">).</span><span class="na">getBody</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">ExpiredJwtException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="na">getClaims</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>토큰 발급 및 인증 확인, 토큰 validation 을 처리하는 Class 이다. 각 메서드에 대한 설명은 다음과 같다.</p>
+
+<h3 id="generatetokendto">generateTokenDto()</h3>
+<p>인증에 성공한 Authentication 객체를 인자로 받아 권한에 맞는 Token 을 발급해주는 메서드이다.</p>
+
+<h3 id="getauthentication">getAuthentication()</h3>
+<p>AccessToken 을 인자로 받아 토큰의 인증을 꺼내는 메서드이다. 뒤이어 설명할 parseClaims() 메서드를 통해 AccessToken 을 jwt 정보 단위인 claim 으로 변환하여 사용한다. 이 후 claim 에서 발췌한 인가 정보를 포함하여 인증을 반환한다.</p>
+
+<h3 id="validationtoken">validationToken()</h3>
+<p>token 정보를 인자로 받아 잘못된 토큰인지 확인하는 메서드이다.</p>
+
+<h3 id="parseclaims">parseClaims()</h3>
+<p>jwt 로 전달되는 정보의 한 조각을 claim 이라고 하는데 이러한 형태로 AccessToken 을 반환해준다.</p>
+
+<h2 id="jwtfilter">JwtFilter</h2>
+
+<p>path: /common/jwt/JwtFilter</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">laegel.nailart.common.jwt</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.servlet.FilterChain</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.servlet.ServletException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.servlet.http.HttpServletRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.servlet.http.HttpServletResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">lombok.RequiredArgsConstructor</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.Authentication</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.context.SecurityContextHolder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.util.StringUtils</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.filter.OncePerRequestFilter</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">JwtFilter</span> <span class="kd">extends</span> <span class="nc">OncePerRequestFilter</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">AUTHORIZATION_HEADER</span> <span class="o">=</span> <span class="s">"Authorization"</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">BEARER_PREFIX</span> <span class="o">=</span> <span class="s">"Bearer"</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">TokenProvider</span> <span class="n">tokenProvider</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="nf">resolveToken</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">bearerToken</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getHeader</span><span class="o">(</span><span class="no">AUTHORIZATION_HEADER</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">hasText</span><span class="o">(</span><span class="n">bearerToken</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">bearerToken</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="no">BEARER_PREFIX</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">bearerToken</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">7</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doFilterInternal</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="nc">FilterChain</span> <span class="n">filterChain</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">ServletException</span><span class="o">,</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">jwt</span> <span class="o">=</span> <span class="n">resolveToken</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">hasText</span><span class="o">(</span><span class="n">jwt</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">tokenProvider</span><span class="o">.</span><span class="na">validateToken</span><span class="o">(</span><span class="n">jwt</span><span class="o">))</span> <span class="o">{</span>
+            <span class="nc">Authentication</span> <span class="n">authentication</span> <span class="o">=</span> <span class="n">tokenProvider</span><span class="o">.</span><span class="na">getAuthentication</span><span class="o">(</span><span class="n">jwt</span><span class="o">);</span>
+            <span class="nc">SecurityContextHolder</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">setAuthentication</span><span class="o">(</span><span class="n">authentication</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="n">filterChain</span><span class="o">.</span><span class="na">doFilter</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>OncePerRequestFilter 를 상속받아 한 요청에 한 번만 수행되게끔 구성하였다. http 요청이 들어올 시 토큰 정보를 꺼내와서 앞에서 설명했던 TokenProvider 를 통해 토큰을 검증한다. 검증 완료 시 SecurityContext 에 Authentication 객체를 저장한다.</p>
+
+<h3 id="resolvetoken">resolveToken()</h3>
+<p>HttpServletRequest 로 받은 request header 에서 토큰 정보를 꺼내오는 메서드이다.</p>
+
+<h3 id="dofilterinternal">doFilterInternal()</h3>
+<p>resolveToken() 메서드를 통해 꺼내온 토큰 정보를 가지고 검증을 하는 메서드이다. 토큰 정보가 유효하다면 Authentication 객체를 가져와 SecurityContext 에 저장한다.<br />
+SecurityContext 에서 허가된 uri 이외의 모든 request 요청은 전부 이 필터를 거치게 되며, 토큰 정보가 없거나 유효하지 않으면 정상적으로 수행되지 않는다.</p>
+
+<h2 id="jwtauthenticationentrypoint">JwtAuthenticationEntryPoint</h2>
+
+<p>path: /common/jwt/JwtAuthenticationEntryPoint</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">laegel.nailart.common.jwt</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.servlet.ServletException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.servlet.http.HttpServletRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.servlet.http.HttpServletResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.AuthenticationException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.web.AuthenticationEntryPoint</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">JwtAuthenticationEntryPoint</span> <span class="kd">implements</span> <span class="nc">AuthenticationEntryPoint</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">commence</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="nc">AuthenticationException</span> <span class="n">authException</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span><span class="o">,</span> <span class="nc">ServletException</span> <span class="o">{</span>
+        <span class="c1">// 유효한 자격증명을 제공하지 않고 접근하려 할 때 401</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">sendError</span><span class="o">(</span><span class="nc">HttpServletResponse</span><span class="o">.</span><span class="na">SC_UNAUTHORIZED</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="jwtaccessdeniedhandler">JwtAccessDeniedHandler</h2>
+
+<p>path: /common/jwt/JwtAccessDeniedHandler</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">laegel.nailart.common.jwt</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.servlet.ServletException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.servlet.http.HttpServletRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.servlet.http.HttpServletResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.access.AccessDeniedException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.web.access.AccessDeniedHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">JwtAccessDeniedHandler</span> <span class="kd">implements</span> <span class="nc">AccessDeniedHandler</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handle</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="nc">AccessDeniedException</span> <span class="n">accessDeniedException</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span><span class="o">,</span> <span class="nc">ServletException</span> <span class="o">{</span>
+        <span class="c1">// 필요한 권한 없이 접근하려 할 때 403</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">sendError</span><span class="o">(</span><span class="nc">HttpServletResponse</span><span class="o">.</span><span class="na">SC_FORBIDDEN</span><span class="o">);</span>
+
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>JwtAuthenticationEntryPoint, JwtAccessDeniedHandler 두 클래스 모두 유효하지 않은 접근을 할 때 error 를 뿜어내는 컴포넌트이다.</p>
+
+<h2 id="jwtsecurityconfig">JwtSecurityConfig</h2>
+
+<p>path: /common/config/JwtSecurityConfig</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">laegel.nailart.config</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">laegel.nailart.common.jwt.JwtFilter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">laegel.nailart.common.jwt.TokenProvider</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">lombok.RequiredArgsConstructor</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.config.annotation.SecurityConfigurerAdapter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.config.annotation.web.builders.HttpSecurity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.web.DefaultSecurityFilterChain</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter</span><span class="o">;</span>
+
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">JwtSecurityConfig</span> <span class="kd">extends</span> <span class="nc">SecurityConfigurerAdapter</span><span class="o">&lt;</span><span class="nc">DefaultSecurityFilterChain</span><span class="o">,</span> <span class="nc">HttpSecurity</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">TokenProvider</span> <span class="n">tokenProvider</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">JwtFilter</span> <span class="n">customFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">JwtFilter</span><span class="o">(</span><span class="n">tokenProvider</span><span class="o">);</span>
+        <span class="n">http</span><span class="o">.</span><span class="na">addFilterBefore</span><span class="o">(</span><span class="n">customFilter</span><span class="o">,</span> <span class="nc">UsernamePasswordAuthenticationFilter</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Spring Security 설정을 커스터마이징 하는 부분이다.<br />
+TokenProvider 를 생성하고 우리가 만든 JwtFilter에 주입한 후 SecurityConfig 에 JwtFilter 를 등록하는 과정이다.<br />
+configure() 를 오버라이드하여 jwt 관련 filter 들을 세팅해준다.</p>
+
+<p>WebSecurityConfigurerAdapter 가 deprecated 되어 SecurityConfigurerAdapter 를 사용하였다.</p>
+
+<h2 id="websecurityconfig">WebSecurityConfig</h2>
+
+<p>path: /common/config/WebSecurityConfig</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">laegel.nailart.config</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">laegel.nailart.common.jwt.JwtAccessDeniedHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">laegel.nailart.common.jwt.JwtAuthenticationEntryPoint</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">laegel.nailart.common.jwt.TokenProvider</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">lombok.RequiredArgsConstructor</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Bean</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.config.annotation.web.builders.HttpSecurity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.config.annotation.web.configuration.EnableWebSecurity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.config.http.SessionCreationPolicy</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.crypto.password.PasswordEncoder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.web.SecurityFilterChain</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+
+<span class="nd">@Component</span>
+<span class="nd">@Configuration</span>
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="nd">@EnableWebSecurity</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSecurityConfig</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">TokenProvider</span> <span class="n">tokenProvider</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">JwtAuthenticationEntryPoint</span> <span class="n">jwtAuthenticationEntryPoint</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">JwtAccessDeniedHandler</span> <span class="n">jwtAccessDeniedHandler</span><span class="o">;</span>
+
+    <span class="nd">@Bean</span>
+    <span class="kd">public</span> <span class="nc">PasswordEncoder</span> <span class="nf">passwordEncoder</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">BCryptPasswordEncoder</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Bean</span>
+    <span class="kd">public</span> <span class="nc">SecurityFilterChain</span> <span class="nf">filterChain</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">http</span>
+                <span class="o">.</span><span class="na">httpBasic</span><span class="o">().</span><span class="na">disable</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">csrf</span><span class="o">().</span><span class="na">disable</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">sessionManagement</span><span class="o">().</span><span class="na">sessionCreationPolicy</span><span class="o">(</span><span class="nc">SessionCreationPolicy</span><span class="o">.</span><span class="na">STATELESS</span><span class="o">)</span>
+
+                <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">exceptionHandling</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">authenticationEntryPoint</span><span class="o">(</span><span class="n">jwtAuthenticationEntryPoint</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">accessDeniedHandler</span><span class="o">(</span><span class="n">jwtAccessDeniedHandler</span><span class="o">)</span>
+
+                <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="k">new</span> <span class="nc">JwtSecurityConfig</span><span class="o">(</span><span class="n">tokenProvider</span><span class="o">))</span>
+
+                <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">authorizeHttpRequests</span><span class="o">(</span><span class="n">authorize</span> <span class="o">-&gt;</span> <span class="n">authorize</span>
+                        <span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/admin/auth/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">anyRequest</span><span class="o">().</span><span class="na">authenticated</span><span class="o">()</span>
+                <span class="o">);</span>
+
+        <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Spring Security 핵심 객체 HttpSecurity의 filterChain 을 구성하는 클래스이다.<br />
+예외 핸들링을 위해 이전에 작성했던 JwtAuthenticationEntryPoint, JwtAccessDeniedHanlder 를 적용하고 ‘/admin/auth/**’ 를 제외한 모든 uri 에 토큰이 필요하다는 것을 적용시켰다.<br />
+(세세한 filter 커스터마이징은 입맛에 맞게 적용하면 된다.)</p>
+
+<h2 id="securityutil">SecurityUtil</h2>
+
+<p>path: /common/config/SecurityUtil</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">laegel.nailart.config</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.Authentication</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.context.SecurityContextHolder</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityUtil</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nf">SecurityUtil</span><span class="o">()</span> <span class="o">{}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Long</span> <span class="nf">getCurrentMemberId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="nc">Authentication</span> <span class="n">authentication</span> <span class="o">=</span> <span class="nc">SecurityContextHolder</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">getAuthentication</span><span class="o">();</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">authentication</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getName</span><span class="o">()</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">"Security Context에 인증 정보가 없습니다."</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="nc">Long</span><span class="o">.</span><span class="na">parseLong</span><span class="o">(</span><span class="n">authentication</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>인증이 완료된 Authentication 을 담고있는 SecurityContext 유저 정보를 가져오는 클래스이다.</p>
+
+<h2 id="tokendto">TokenDto</h2>
+
+<p>path: /common/jwt/TokenDto</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">laegel.nailart.common.dto</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">lombok.AllArgsConstructor</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">lombok.Builder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">lombok.Getter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">lombok.NoArgsConstructor</span><span class="o">;</span>
+
+<span class="nd">@Getter</span>
+<span class="nd">@NoArgsConstructor</span>
+<span class="nd">@AllArgsConstructor</span>
+<span class="nd">@Builder</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TokenDto</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">grantType</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">accessToken</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">tokenExpiresIn</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>토큰 정보를 담는 Dto</p>
+
+<p>이제 기본적인 Spring Security + JWT 구현은 끝이 났다. 이후 로그인 및 회원가입 로직을 구미에 맞게 만들면 된다.  <br />
+주의해야 할 점은 비밀번호의 경우 PasswordEncoder를 사용해 검증해야 한다.</p>
+
+<p><a href="#" class="btn btn--primary align-right">맨 위로 이동하기</a></p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 태그: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#spring-security" class="page__taxonomy-item p-category" rel="tag">Spring Security</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> 카테고리: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#spring-security" class="page__taxonomy-item p-category" rel="tag">Spring Security</a>
+    
+    </span>
+  </p>
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 업데이트:</strong> <time class="dt-published" datetime="2023-08-08">August 8, 2023</time></p>
+
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">공유하기</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=%5BSpring+Security%5D+Spring+Security+%2B+JWT+%EA%B5%AC%ED%98%84%20http%3A%2F%2Flocalhost%3A4000%2Fspring%2520security%2Fch1%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fspring%2520security%2Fch1%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2Fspring%2520security%2Fch1%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+
+
+  
+  
+  
+    
+    
+    
+
+
+  <nav class="pagination_prev_next">
+    
+      <a href="/blog/spring%20security/ch0/" class="pagination_prev_next--pager"><span class="prev_next">이전 글  &nbsp</span>[Spring Security] Spring Security 란 ?</a>
+    
+    
+      <a href="#" class="pagination_prev_next--pager disabled">가장 최근 글입니다</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">참고</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/reflection/ch0/" rel="permalink">[Java] 리플렉션(Reflection) 알아보기
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          최대 1 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">리플렉션(Reflection) 이란 ?
+리플렉션 은 구체적인 클래스 타입을 알지 못하더라도 그 클래스의 메서드, 타입, 변수들에 접근할 수 있도록 도와주는 자바 API를 말한다. 이 프로그래밍 기법은 런타임 시점에 동적으로 특정 클래스의 정보를 추출할 수 있게 도와줘 프로그램에 유...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch2/" rel="permalink">[JVM] JVM 총정리 - 실행 엔진(3)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">실행 엔진은 Runtime Data Area 에 적재된 바이트코드들을 실행하고 사용되지 않는 데이터들을 제거하는 역할을 하며 세 가지 장치로 구분된다.
+
+  인터프리터(Interpreter)
+  JIT Compiler
+  Garbage Collector
+
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch1/" rel="permalink">[JVM] JVM 총정리 - 런타임 영역(2)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          4 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">런타임 영역 은 JVM 이 런타임 환경에서 자바 프로그램을 수행할 때 OS 로부터 할당받는 메모리 영역이다. 이 메모리 영역은 논리적으로 다음과 같이 5가지 영역으로 구분한다.
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch0/" rel="permalink">[JVM] JVM 총정리 - 클래스 로더(1)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          4 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">JVM 은 사용자 컴퓨터 운영체제에 맞는 JRE 에 포함되어 있는 소프트웨어로, 바이트 코드로 변환된 자바 코드를 실행시켜주는 역할을 한다. 또한 자바 프로그램을 실행함에 있어 .class 파일에 대한 유효성 검사와 메모리 관리, GC 등의 작업을 수행하기 때문에 매우 중요한 소프...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>팔로우:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> 피드</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 laegel. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+    <script>
+  'use strict';
+
+  (function() {
+    var commentContainer = document.querySelector('#utterances-comments');
+
+    if (!commentContainer) {
+      return;
+    }
+
+    var script = document.createElement('script');
+    script.setAttribute('src', 'https://utteranc.es/client.js');
+    script.setAttribute('repo', 'laegel123/blog');
+    script.setAttribute('issue-term', 'pathname');
+    
+    script.setAttribute('theme', 'github-light');
+    script.setAttribute('crossorigin', 'anonymous');
+
+    commentContainer.appendChild(script);
+  })();
+</script>
+
+  
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,819 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="ko" class="no-js">
+  <head>
+    <!--폰트 : "Nanum Gothic Coding", "Coming Soon"-->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Coming+Soon&family=Nanum+Gothic+Coding&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Coming+Soon&family=Nanum+Gothic+Coding&display=swap">
+
+    <!--폰트 : "Iropke Batang"-->
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/font-iropke-batang/1.2/font-iropke-batang.css">
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>[JVM] JVM 총정리 - 클래스 로더(1) - diary</title>
+<meta name="description" content="JVM 은 사용자 컴퓨터 운영체제에 맞는 JRE 에 포함되어 있는 소프트웨어로, 바이트 코드로 변환된 자바 코드를 실행시켜주는 역할을 한다. 또한 자바 프로그램을 실행함에 있어 .class 파일에 대한 유효성 검사와 메모리 관리, GC 등의 작업을 수행하기 때문에 매우 중요한 소프트웨어라고 할 수 있다.">
+
+
+  <meta name="author" content="laegel">
+  
+  <meta property="article:author" content="laegel">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="diary">
+<meta property="og:title" content="[JVM] JVM 총정리 - 클래스 로더(1)">
+<meta property="og:url" content="http://localhost:4000/jvm/ch0/">
+
+
+  <meta property="og:description" content="JVM 은 사용자 컴퓨터 운영체제에 맞는 JRE 에 포함되어 있는 소프트웨어로, 바이트 코드로 변환된 자바 코드를 실행시켜주는 역할을 한다. 또한 자바 프로그램을 실행함에 있어 .class 파일에 대한 유효성 검사와 메모리 관리, GC 등의 작업을 수행하기 때문에 매우 중요한 소프트웨어라고 할 수 있다.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2023-07-31T00:00:00+09:00">
+
+
+
+  <meta property="article:modified_time" content="2023-07-31T00:00:00+09:00">
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/jvm/ch0/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "laegel",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="diary Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+<link rel="manifest" href="/blog/site.webmanifest">
+<link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          diary
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/index.html">Home</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/">Category</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">토글 메뉴</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/img/logo/android-chrome-192x192.png" alt="laegel" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">laegel</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>반갑습니다. :)</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">팔로우</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Seoul of Republic Korea</span>
+        </li>
+      
+
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+
+  
+    
+
+<nav class="nav__list">
+  <input id="ac-toc" name="accordion-toc" type="checkbox" />
+  <label for="ac-toc">토글 메뉴</label>
+  <ul class="nav__items" id="category_tag_menu">
+      <li>
+            📂 <span style="font-family:'Cafe24Oneprettynight';">전체 글 수</style> <span style="font-family:'Coming Soon';">6</style> <span style="font-family:'Cafe24Oneprettynight';">개</style> 
+      </li>
+      <li>
+          <span class="nav__sub-title">Java</span>
+          <ul>
+              
+                  
+              
+                  
+                      <li><a href="/blog/categories/java-jvm" class="">JVM (3)</a></li>
+                  
+              
+                  
+              
+              
+                  
+              
+                  
+              
+                  
+                      <li><a href="/blog/categories/java-reflection" class="">Reflection (1)</a></li>
+                  
+              
+          </ul>
+          <span class="nav__sub-title">Spring</span>
+          <ul>
+            
+                
+                    <li><a href="/blog/categories/spring-security" class="">Spring Security (2)</a></li>
+                
+            
+                
+            
+                
+            
+          </ul>
+
+
+      </li>
+      <li>	
+            <br>      
+            <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Flaegel123%2Fblog&count_bg=%23D0AADB&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=visitors&edge_flat=false" style="width:100px">
+      </li>
+  </ul>
+</nav>
+
+
+  
+
+  </div>
+
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="[JVM] JVM 총정리 - 클래스 로더(1)">
+    <meta itemprop="description" content="JVM 은 사용자 컴퓨터 운영체제에 맞는 JRE 에 포함되어 있는 소프트웨어로, 바이트 코드로 변환된 자바 코드를 실행시켜주는 역할을 한다. 또한 자바 프로그램을 실행함에 있어 .class 파일에 대한 유효성 검사와 메모리 관리, GC 등의 작업을 수행하기 때문에 매우 중요한 소프트웨어라고 할 수 있다.">
+    <meta itemprop="datePublished" content="2023-07-31T00:00:00+09:00">
+    <meta itemprop="dateModified" content="2023-07-31T00:00:00+09:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/jvm/ch0/" class="u-url" itemprop="url">[JVM] JVM 총정리 - 클래스 로더(1)
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          4 분 소요
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On This Page</h4></header>
+              <ul class="toc__menu"><li><a href="#1-jvm-내부구조">1. JVM 내부구조</a></li><li><a href="#2-클래스-로더-class-loader">2. 클래스 로더 (Class Loader)</a><ul><li><a href="#2-1-로딩-loading">2-1. 로딩 (Loading)</a><ul><li><a href="#2-1-1-bootstrap-class-loader">2-1-1. Bootstrap Class Loader</a></li><li><a href="#2-1-2-extensions-class-loader">2-1-2. Extensions Class Loader</a></li><li><a href="#2-1-3-application-class-loader">2-1-3. Application Class Loader</a></li></ul></li><li><a href="#jdk-9-버전-이후-변경점">JDK 9 버전 이후 변경점</a><ul><li><a href="#1-bootstrap-class-loader">1. Bootstrap Class Loader</a></li><li><a href="#2-platform-class-loader">2. Platform Class Loader</a></li><li><a href="#3-system-class-loader">3. System Class Loader</a></li></ul></li><li><a href="#loading-동작-방식">Loading 동작 방식</a></li><li><a href="#2-2-링킹-linking">2-2. 링킹 (Linking)</a><ul><li><a href="#1-검증-verification">1) 검증 (Verification)</a></li><li><a href="#2-준비-preparation">2) 준비 (Preparation)</a></li><li><a href="#3-해석-resolutions">3) 해석 (Resolutions)</a></li></ul></li><li><a href="#2-3-초기화-initialization">2-3. 초기화 (Initialization)</a></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p><code class="language-plaintext highlighter-rouge">JVM</code> 은 사용자 컴퓨터 운영체제에 맞는 JRE 에 포함되어 있는 소프트웨어로, 바이트 코드로 변환된 자바 코드를 실행시켜주는 역할을 한다. 또한 자바 프로그램을 실행함에 있어 .class 파일에 대한 유효성 검사와 메모리 관리, GC 등의 작업을 수행하기 때문에 매우 중요한 소프트웨어라고 할 수 있다.</p>
+
+<p>먼저 JVM 내부 구조를 살펴보자.</p>
+
+<h2 id="1-jvm-내부구조">1. JVM 내부구조</h2>
+
+<p><code class="language-plaintext highlighter-rouge">JVM</code> 은 크게 다음과 같이 이루어져 있다.</p>
+
+<ul>
+  <li>클래스 로더 (class loader)</li>
+  <li>실행 엔진 (execution engine)
+    <ul>
+      <li>인터프리터 (interpreter)</li>
+      <li>JIT Compiler</li>
+      <li>가비지 콜렉터 (garbage collector)</li>
+    </ul>
+  </li>
+  <li>런타임 영역 (runtime data area)</li>
+</ul>
+
+<p>이것을 그림으로 표현하면 다음과 같다.<br />
+<img src="../../assets/img/java/jvm01.png" /></p>
+
+<h2 id="2-클래스-로더-class-loader">2. 클래스 로더 (Class Loader)</h2>
+
+<p>클래스 로더는 런타임 환경에서 동적으로 .class 파일을 읽어 런타임 영역 (Runtime Data Area) 에 적재한다. 뿐만 아니라 클래스 파일이 유효한지 검증하고, 필드 및 메서드를 초기화 하는 역할을 하는 매우 중요한 부분이다.
+클래스 로더는 위 역할을 수행하기 위해 크게 세 가지 과정을 거쳐 동작하는데 그림으로 표현하자면 다음과 같다.
+ <img src="../../assets/img/java/jvm02.png" /></p>
+
+<h3 id="2-1-로딩-loading">2-1. 로딩 (Loading)</h3>
+<p>로딩 단계는 JVM 이 런타임 환경에서 필요한 클래스 파일을 찾아 탑재하는 과정을 말한다. 이 동작은 각각의 클래스 파일들이 JDK 에 의해 기본적으로 제공받는 클래스 파일인지 혹은 개발자가 정의한 클래스 파일인지와 같은 기준에 의해
+세 가지 Class Loader 로 나뉘어 실행된다.<br />
+ <img src="../../assets/img/java/jvm03.png" /></p>
+
+<h4 id="2-1-1-bootstrap-class-loader">2-1-1. Bootstrap Class Loader</h4>
+<p>JVM 이 시작되고 가장 최초로 실행되는 최상위 Class Loader 이다. <code class="language-plaintext highlighter-rouge">Bootstrap Class Loader</code> 는 JDK 8 기준으로 jre/lib/rt.jar 파일에 위치한 자바 런타임 코어 클래스들을 로드한다. 런타임 코어 클래스들에는 java.lang, java.util 등과 같은
+필수 패키지들이 들어있다.<br />
+ <code class="language-plaintext highlighter-rouge">Bootstrap Class Loader</code> 는 가장 상위의 Class Loader 이므로 다른 Clas Loader 와 다르게 탑재되는 운영체제에 맞게 Native Code 로 쓰여있다.</p>
+
+<h4 id="2-1-2-extensions-class-loader">2-1-2. Extensions Class Loader</h4>
+<p><code class="language-plaintext highlighter-rouge">Bootstrap Class Loader</code> 다음으로 우선순위를 가지는 Class Loader 이다. 주로 jre/lib/ext 디렉토리나 java.ext.dirs 환경 변수로 지정한 디렉토리 안에 있는 클래스 파일들을 로딩하며 JDK 확장 라이브러리들을 다룬다.</p>
+
+<h4 id="2-1-3-application-class-loader">2-1-3. Application Class Loader</h4>
+<p>자바 프로그램 실행 시 classpath 에 있는 클래스 혹은 jar 에 속한 클래스들을 로드한다. 주로 개발자들이 작성한 자바 코드 클래스 파일들을 탑재하는 역할을 하고 있다.</p>
+
+<blockquote>
+  <h3 id="jdk-9-버전-이후-변경점">JDK 9 버전 이후 변경점</h3>
+  <p>JDK 9 버전 이후 JDK 에 module 개념이 새롭게 탑재되며 기존 jre, ext 디렉토리 등이 삭제되고 해당 기능들은 작은 단위의 모듈로 분리되게 되었다. 이로 인해 자바 프로그램이 전체 JDK 를 실행하지 않아 더 효율적인 포맷으로 진화하였다.
+ 또한 이러한 변경점으로 인해 주요 Class Loader 들의 주요 기능이나 명칭도 변경되었다. 아래는 JDK 9 버전 이후의 변경점이다.</p>
+
+  <h4 id="1-bootstrap-class-loader">1. Bootstrap Class Loader</h4>
+  <p>기존에는 모든 Java SE 클래스들을 로드할 수 있었지만, rt.jar 가 모듈화되어 작은 단위로 나뉘어지면서 java.base 같은 중요한 모듈의 클래스 로딩만 다루게 역할이 축소되었다.</p>
+
+  <h4 id="2-platform-class-loader">2. Platform Class Loader</h4>
+  <p>Extensions Class Loader 에서 명칭이 변경되었다. Java SE 플랫폼에 있는 모든 클래스들에 대해 로더 역할을 수행할 수 있게 확장되었으며 Java SE 플랫폼에 속해있지 않은 표준화된 JCP(Java Community Process) 클래스에 대해서도 로더 역할을 할 수 있게 변경되었다.</p>
+
+  <h4 id="3-system-class-loader">3. System Class Loader</h4>
+  <p>Application Class Loader 에서 명칭이 변경되었다. Java SE 나 모듈이 아닌 모듈들에 대해서도 default 로더 역할을 수행할 수 있게 변경되었다.</p>
+
+  <p>자세한 변경사항은 <a href="https://homoefficio.github.io/2018/10/14/Java-URLClassLoader%EB%A1%9C-%EC%95%8C%EC%95%84%EB%B3%B4%EB%8A%94-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%A1%9C%EB%94%A9/">다음</a></p>
+</blockquote>
+
+<h3 id="loading-동작-방식">Loading 동작 방식</h3>
+<p>Class Loader 는 다음과 같은 위임 방식으로 클래스들을 로딩한다.<br />
+<em>System Class Loader -&gt; Platform Class Loader -&gt; Bootstrap Class Loader</em></p>
+
+<p>요청한 클래스가 위와 같은 위임 과정을 거쳐 Class Loader 에 의해 로드가 되지 않는다면 java.lang.ClassNotFoundException 이 발생하겟지만, 로드에 성공한다면 내용에 맞는 바이너리 데이터를 생성한 뒤 메모리의 Method Area 에 저장한다. 그 후 Class<객체이름> 형태의 해당 클래스
+타입의 class 객체를 생성해 Heap 영역에 저정하게 된다.</객체이름></p>
+
+<h3 id="2-2-링킹-linking">2-2. 링킹 (Linking)</h3>
+<p>이 단계에서는 로드된 클래스나 인터페이스, 필요한 경우 요소 타입을 검증하고 사용할 수 있게 준비하는 과정을 포함한다. 이 작업은 Verification, Preparation, Resolution 이라는 세 단계로 이루어진다.</p>
+
+<h4 id="1-검증-verification">1) 검증 (Verification)</h4>
+<p>클래스 로더가 .class 파일의 바이트코드를 자바 언어 명세서 (Java Language Specification) 에 따라서 코드를 제대로 작성했는지, JVM 규격에 맞게 검증된 컴파일러에서 .class 파일이 생성되었는지 등을 확인하여 .class 파일의 정확성을 보장해준다.<br />
+ 내부적으로 바이트 코드 검증기가 이 과정을 담당하며 만약 검증이 실패한다면 java.lang.VerifyError 를 발생시킨다. 다만, Bootstrap ClassLoader 에 의해 로드된 클래스들은 신뢰성이 높은 자원에서 로드된 클래스들이기 때문에 해당 Verification 단계를 거치지 않는다.</p>
+
+<p>이러한 Verification 은 사실 컴파일 단계에서도 수행이 된다. 하지만 JVM 에서 다시 한 번 이 검증을 거치게 되면서 클래스 파일의 악의적인 혹은 유효하지 않는 변경을 미연에 방지할 수 있게 된다.</p>
+
+<h4 id="2-준비-preparation">2) 준비 (Preparation)</h4>
+<p>이 단계에서는 static fields 에 대한 메모리를 할당한다. 다만, 주어진 값으로 초기화는 나중에 진행될 Initializa 단계에서 실행되면 이 단계에서는 타입의 기본 값으로 초기화가 진행된다. 때문에 이 단계에서 클래스 파일의 코드를 작동시키진 않는다.<br />
+만약, 이 단계에서 할당할 메모리 공간이 부족하다면 OutOfMemoryError 가 발생한다.</p>
+
+<h4 id="3-해석-resolutions">3) 해석 (Resolutions)</h4>
+<p>해석 단계는 해당 클래스의 참조된 클래스들을 로드하는 과정이다. 이 과정은 Linking 의 Preparation 단계에서 수행될 수도 있고, Initialization 단계 이후 수행될 수도 있다.</p>
+
+<p>Linking 작업은 필요할 때마다 동적으로 이루어지기 때문에 Dynamic Linking 이라는 표현을 사용하기도 한다.<br />
+사실 .class 파일은 실행 시 Link 될 수 있도록 Symbolic Reference 만을 가지고 있다. 이 Symblic Reference 는 해석 단계에서 Method Area 의 Runtime Constant Pool 을 거쳐 실제로 존재하는 물리적인 주소로 대체되게 된다. 이러한 과정의 Dynamic Linking 덕분에 class 파일의
+크기를 작게 유지할 수 있어 메모리 요구사항이 훨씬 적어지게 된다.</p>
+
+<h3 id="2-3-초기화-initialization">2-3. 초기화 (Initialization)</h3>
+
+<p>이 과정에서는 로드된 각 클래스나 인터페이스의 코드를 읽고 초기화 로직이 실행되게 된다. static 변수와 메서드가 코드에 명시된 원래 값으로 할당이 되고, 정적 초기화 블록이 실행되게 된다. 이 작업은 클래스의 위에서 아래로, 클래스 계층 구조에서 부모부터 자식까지 한 줄씩 진행된다.</p>
+
+<p>초기화 과정까지 거쳐 클래스 탑재 과정이 끝나게 된다면 본격적으로 JVM 에서 클래스 파일을 구동시킬 준비가 끝나게 된다.</p>
+
+<p><a href="#" class="btn btn--primary align-right">맨 위로 이동하기</a></p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 태그: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#java" class="page__taxonomy-item p-category" rel="tag">Java</a><span class="sep">, </span>
+    
+      <a href="/tags/#jvm" class="page__taxonomy-item p-category" rel="tag">JVM</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> 카테고리: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#jvm" class="page__taxonomy-item p-category" rel="tag">JVM</a>
+    
+    </span>
+  </p>
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 업데이트:</strong> <time class="dt-published" datetime="2023-07-31">July 31, 2023</time></p>
+
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">공유하기</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=%5BJVM%5D+JVM+%EC%B4%9D%EC%A0%95%EB%A6%AC+-+%ED%81%B4%EB%9E%98%EC%8A%A4+%EB%A1%9C%EB%8D%94%281%29%20http%3A%2F%2Flocalhost%3A4000%2Fjvm%2Fch0%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fjvm%2Fch0%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2Fjvm%2Fch0%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="공유하기 LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+
+
+  
+
+  
+
+  
+  
+  
+    
+    
+    
+
+
+  <nav class="pagination_prev_next">
+    
+      <a href="#" class="pagination_prev_next--pager disabled">첫 번째 글입니다</a>
+    
+    
+      <a href="/blog/jvm/ch1/" class="pagination_prev_next--pager"><span class="prev_next">다음 글  &nbsp  </span>[JVM] JVM 총정리 - 런타임 영역(2)</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">참고</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/spring%20security/ch1/" rel="permalink">[Spring Security] Spring Security + JWT 구현
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">개인 프로젝트 진행을 위해 세팅한 환경 일부를 기록한 글이다.
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/reflection/ch0/" rel="permalink">[Java] 리플렉션(Reflection) 알아보기
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          최대 1 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">리플렉션(Reflection) 이란 ?
+리플렉션 은 구체적인 클래스 타입을 알지 못하더라도 그 클래스의 메서드, 타입, 변수들에 접근할 수 있도록 도와주는 자바 API를 말한다. 이 프로그래밍 기법은 런타임 시점에 동적으로 특정 클래스의 정보를 추출할 수 있게 도와줘 프로그램에 유...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch2/" rel="permalink">[JVM] JVM 총정리 - 실행 엔진(3)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">실행 엔진은 Runtime Data Area 에 적재된 바이트코드들을 실행하고 사용되지 않는 데이터들을 제거하는 역할을 하며 세 가지 장치로 구분된다.
+
+  인터프리터(Interpreter)
+  JIT Compiler
+  Garbage Collector
+
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/jvm/ch1/" rel="permalink">[JVM] JVM 총정리 - 런타임 영역(2)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 분 소요
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">런타임 영역 은 JVM 이 런타임 환경에서 자바 프로그램을 수행할 때 OS 로부터 할당받는 메모리 영역이다. 이 메모리 영역은 논리적으로 다음과 같이 5가지 영역으로 구분한다.
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>팔로우:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> 피드</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 laegel. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+    <script>
+  'use strict';
+
+  (function() {
+    var commentContainer = document.querySelector('#utterances-comments');
+
+    if (!commentContainer) {
+      return;
+    }
+
+    var script = document.createElement('script');
+    script.setAttribute('src', 'https://utteranc.es/client.js');
+    script.setAttribute('repo', 'laegel123/blog');
+    script.setAttribute('issue-term', 'pathname');
+    
+    script.setAttribute('theme', 'github-light');
+    script.setAttribute('crossorigin', 'anonymous');
+
+    commentContainer.appendChild(script);
+  })();
+</script>
+
+  
+
+
+
+
+
+  </body>
+</html>
