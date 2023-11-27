@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://laegel123.github.io/blog/sitemap.xml
+Sitemap: https://laegel123.github.io/sitemap.xml
