@@ -12,12 +12,12 @@
           <ul>
               {% for category in site.categories %}
                   {% if category[0] == "JVM" %}
-                      <li><a href="/blog/categories/java-jvm" class="">JVM ({{category[1].size}})</a></li>
+                      <li><a href="/categories/java-jvm" class="">JVM ({{category[1].size}})</a></li>
                   {% endif %}
               {% endfor %}
               {% for category in site.categories %}
                   {% if category[0] == "Reflection" %}
-                      <li><a href="/blog/categories/java-reflection" class="">Reflection ({{category[1].size}})</a></li>
+                      <li><a href="/categories/java-reflection" class="">Reflection ({{category[1].size}})</a></li>
                   {% endif %}
               {% endfor %}
           </ul>
@@ -25,7 +25,15 @@
           <ul>
             {% for category in site.categories %}
                 {% if category[0] == "Spring Security" %}
-                    <li><a href="/blog/categories/spring-security" class="">Spring Security ({{category[1].size}})</a></li>
+                    <li><a href="/categories/spring-security" class="">Spring Security ({{category[1].size}})</a></li>
+                {% endif %}
+            {% endfor %}
+          </ul>
+          <span class="nav__sub-title">Algorithm</span>
+          <ul>
+            {% for category in site.categories %}
+                {% if category[0] == "Algorithm" %}
+                    <li><a href="/categories/algorithm" class="">Algorithm ({{category[1].size}})</a></li>
                 {% endif %}
             {% endfor %}
           </ul>
