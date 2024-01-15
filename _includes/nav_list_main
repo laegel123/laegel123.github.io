@@ -36,6 +36,11 @@
                     <li><a href="/categories/algorithm" class="">Algorithm ({{category[1].size}})</a></li>
                 {% endif %}
             {% endfor %}
+            {% for category in site.categories %}
+                {% if category[0] == "Prefix Sum Problems" %}
+                    <li><a href="/categories/algorithm-prefix-sum" class="">Prefix Sum Problems ({{category[1].size}})</a></li>
+                {% endif %}
+            {% endfor %}
           </ul>
 
 
