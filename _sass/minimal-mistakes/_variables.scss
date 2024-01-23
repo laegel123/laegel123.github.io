@@ -14,7 +14,7 @@ $indent-var: 1.3em !default;
 
 /* system typefaces */
 $serif: "Coming Soon", Georgia, Times, serif !default;
-$sans-serif: "Iropke Batang", -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI",
+$sans-serif: /*"Iropke Batang",*/ -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI",
   "Helvetica Neue", "Lucida Grande", Arial, sans-serif !default;
 $monospace: "Nanum Gothic Coding", Monaco, Consolas, "Lucida Console", monospace !default;
 $cute: "Cafe24Oneprettynight" !default;
@@ -30,8 +30,8 @@ $bodoni: "Bodoni MT", serif !default;
 $calisto: "Calisto MT", serif !default;
 $garamond: Garamond, serif !default;
 
-$global-font-family: $monospace !default;
-$header-font-family: $monospace !default;
+$global-font-family: $sans-serif !default;
+$header-font-family: $sans-serif !default;
 $caption-font-family: $serif !default;
 
 /* type scale */
