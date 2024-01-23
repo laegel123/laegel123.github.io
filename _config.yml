@@ -44,7 +44,7 @@ comments:
     theme                : "github-light"
     issue_term           : "pathname"
   giscus:
-    repo_id              : "laegel123/laegel123.github.io"
+    repo_id              : "R_kgDOKw5iTQ"
     category_name        : "Announcements"
     category_id          : "DIC_kwDOKw5iTc4CcnXj"
     discussion_term      : # "pathname" (default), "url", "title", "og:title"
