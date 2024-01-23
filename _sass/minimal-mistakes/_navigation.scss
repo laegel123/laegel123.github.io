@@ -470,7 +470,7 @@
   a {
     color: inherit;
     font-size: $type-size-3;
-    font-family: $cute;
+    font-family: $sans-serif;
     //color: mix(#fff,$primary-color,80%);
 
     &:hover {
@@ -528,7 +528,7 @@
   font-size: $type-size-3;
   font-family: $sans-serif;
   //color: mix(#fff,$primary-color,35%);
-  border-bottom: 1px solid #ecc8ff;
+  border-bottom: 1px solid #000000;
 }
 
 
