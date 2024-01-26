@@ -1,7 +1,7 @@
 ---
 title: "DFS & BFS Problems"
 layout: archive
-permalink: categories/algorithm-dfs&bfs
+permalink: categories/algorithm-dfs-bfs
 author_profile: true
 sidebar_main: true
 ---
