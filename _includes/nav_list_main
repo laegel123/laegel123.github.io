@@ -16,11 +16,6 @@
                   {% endif %}
               {% endfor %}
               {% for category in site.categories %}
-                  {% if category[0] == "Reflection" %}
-                      <li><a href="/categories/java-reflection" class="">Reflection ({{category[1].size}})</a></li>
-                  {% endif %}
-              {% endfor %}
-              {% for category in site.categories %}
                     {% if category[0] == "Effective Java" %}
                         <li><a href="/categories/java-effective-java" class="">Effective Java ({{category[1].size}})</a></li>
                     {% endif %}
