@@ -1,7 +1,7 @@
 ---
-title: "DFS & BFS Problems"
+title: "leetcode solves"
 layout: archive
-permalink: categories/algorithm-dfs-bfs
+permalink: categories/algorithm-leetcode-solves
 author_profile: true
 sidebar_main: true
 ---
@@ -10,5 +10,5 @@ sidebar_main: true
 
 ***
 
-{% assign posts = site.categories['DFS & BFS Problems'] %}
+{% assign posts = site.categories['leetcode'] %}
 {% for post in posts %} {% include archive-single2.html type=page.entries_layout %} {% endfor %}

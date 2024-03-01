@@ -1,7 +1,7 @@
 ---
-title: "Implementation Sum Problems"
+title: "BOJ solves"
 layout: archive
-permalink: categories/algorithm-implementation
+permalink: categories/algorithm-boj-solves
 author_profile: true
 sidebar_main: true
 ---
@@ -10,5 +10,5 @@ sidebar_main: true
 
 ***
 
-{% assign posts = site.categories['Implementation Problems'] %}
+{% assign posts = site.categories['BOJ'] %}
 {% for post in posts %} {% include archive-single2.html type=page.entries_layout %} {% endfor %}

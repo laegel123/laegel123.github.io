@@ -50,18 +50,13 @@
                 {% endif %}
             {% endfor %}
             {% for category in site.categories %}
-                {% if category[0] == "Prefix Sum Problems" %}
-                    <li><a href="/categories/algorithm-prefix-sum" class="">누적합 문제풀이 ({{category[1].size}})</a></li>
+                {% if category[0] == "BOJ" %}
+                    <li><a href="/categories/algorithm-boj-solves" class="">백준 문제풀이 ({{category[1].size}})</a></li>
                 {% endif %}
             {% endfor %}
             {% for category in site.categories %}
-                {% if category[0] == "Implementation Problems" %}
-                    <li><a href="/categories/algorithm-implementation" class="">구현 문제풀이 ({{category[1].size}})</a></li>
-                {% endif %}
-            {% endfor %}
-            {% for category in site.categories %}
-                {% if category[0] == "DFS & BFS Problems" %}
-                    <li><a href="/categories/algorithm-dfs-bfs" class="">BFS&DFS 문제풀이 ({{category[1].size}})</a></li>
+                {% if category[0] == "leetcode" %}
+                    <li><a href="/categories/algorithm-leetcode-solves" class="">leetcode 문제풀이 ({{category[1].size}})</a></li>
                 {% endif %}
             {% endfor %}
           </ul>
