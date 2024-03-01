@@ -33,6 +33,11 @@
                     <li><a href="/categories/spring-security" class="">Spring Security ({{category[1].size}})</a></li>
                 {% endif %}
             {% endfor %}
+            {% for category in site.categories %}
+                {% if category[0] == "JPA" %}
+                    <li><a href="/categories/jpa" class="">JPA ({{category[1].size}})</a></li>
+                {% endif %}
+            {% endfor %}
           </ul>
           <span class="nav__sub-title">CS</span>
             <ul>
