@@ -16,7 +16,7 @@ minimal_mistakes_skin    : "default" # "air", "aqua", "contrast", "dark", "dirt"
 
 # Site Settings
 locale                   : "ko-KR"
-title                    : "diary"
+title                    : "dev"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "laegel"
@@ -105,10 +105,11 @@ analytics:
 # Site Author
 author:
   name             : "laegel"
-  avatar           : "/assets/img/logo/android-chrome-192x192.png"
+  #avatar           : "/assets/img/logo/android-chrome-192x192.png"
+  avatar           : ""
   bio              : "반갑습니다. :)"
   location         : "Seoul of Republic Korea"
-  email            :
+  email            : "laegel1@gmail.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
