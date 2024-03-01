@@ -108,11 +108,11 @@ author:
   #avatar           : "/assets/img/logo/android-chrome-192x192.png"
   bio              : "반갑습니다. :)"
   location         : "Seoul of Republic Korea"
-  email            : "laegel1@gmail.com"
+  email            : ""
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      url: "laegel1@gmail.com"
+      url: "mailto:laegel1@gmail.com"
     - label: "Website"
       icon: "fas fa-fw fa-link"
       # url: "https://your-website.com"

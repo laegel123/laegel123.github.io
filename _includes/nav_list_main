@@ -34,7 +34,7 @@
                 {% endif %}
             {% endfor %}
           </ul>
-          <span class="nav__sub-title">Computer Science</span>
+          <span class="nav__sub-title">CS</span>
             <ul>
               {% for category in site.categories %}
                   {% if category[0] == "Computer Architecture" %}
