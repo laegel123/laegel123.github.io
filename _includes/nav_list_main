@@ -39,8 +39,8 @@
                 {% endif %}
             {% endfor %}
             {% for category in site.categories %}
-                {% if category[0] == "Framework" %}
-                    <li><a href="/categories/spring-framework" class="">Framework ({{category[1].size}})</a></li>
+                {% if category[0] == "Spring Framework" %}
+                    <li><a href="/categories/spring-framework" class="">Spring Framework ({{category[1].size}})</a></li>
                 {% endif %}
             {% endfor %}
           </ul>
